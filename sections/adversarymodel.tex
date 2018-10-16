@@ -1,0 +1,46 @@
+\section{Adversary Model}
+In this section, we explore the attacks that can be carried out by the adversary. We explain our infrastructure which we used to carry out attack on our victim. Finally, we present the taxonomy of attacks with discussion on their viability, stealthiness and  implications for the domain owners.
+
+\subsection{Infrastructure Setup}
+\textbf{Adversary Configuration:} Depending on the type of attack, different configurations might be required. In our setup, we assume our adversary has an access to compromised machine with public IP address. The adversary will require Dynamic DNS update utility \texttt{nsupdate} to modify the zone of our victim. Email server with forwarding is also required for more sophisticated attacks explained latter. 
+
+\textbf{Victim Configuration:} Our victims are operating  DNS software, with BIND software. In order for the adversary to modify the records victim servers should also be vulnerable with non-secure update of records explained in previous section. In our example victim is running domain \texttt{example.com}. 
+
+
+\subsection{Taxonomy of Attacks}
+
+In a broader sense we can divide the attacks in two main categories a) Denial of Service (DoS) attack and b) man-in-the-middle (MITM) attack. In the first type of attack the adversary will be able to temporary disrupt the service of the victim. It is much easier to execute with limited stealthiness, as victim would notice the unresponsive domain and would be able to quickly fix the configuration. On the other hand, MITM attack would requires more sophistication from the adversary while being more stealthy and difficult to detect. In this section we present details of each of the attacks with our configuration 
+
+\subsubsection{Denial of Service (DoS) Attacks} 
+The DoS attack will only cause limited disruption in the service until the victim gets notified. However, these types of attacks can result in financial losses due to domain downtime or loss of customers, which might move to competitors. The adversary can cause DoS attack using one of the following records. 
+
+\textbf{Deletion of A record of domain/sub-domain:} The adversary can delete A record with command \texttt{update delete example.com A} using nsupdate. This would delete the domain and corresponding IP address of example.com from zone file, resulting in downtime of the traffic. 
+
+\textbf{Deletion of MX records:} Similarly, adversary can also delete MX record which will not only disrupt email service but also hinder any abuse messages sent to victim.  
+
+\textbf{Deletion of NS record:} Deletion of NS record will be most disruptive for the victim as all available domains including email service will be un-accessible to victim and its users till the zone file is updated with correct records. 
+ % Need to check following statements...
+
+ \textbf{Deletion of delegation:} Delegated zones can be used for variety of purposes. It can be used for management of domains and subdomains or for the backup if master zone is down,  when configured as slave. If adversary successfully deletes delegation in the zone file. It would not only cause service disruption to the  domains handled by delegated server, but would also disrupt backup. 
+
+
+\subsubsection{Man-in-the-middle (MITM) Attacks}
+The second type of attack that adversary can utilize is MITM attack. These attacks can be more sophisticated and harder to detect. 
+
+\textbf{Add/Update of A record to own server:}
+\begin{itemize}
+\item redirect traffic for disruption
+\item add a subdomain and redirect info after stealing 
+\item add a subdomain to launch a phising attack 
+\item add a domain with domain verfication using certs to show as legitimate site 
+\end{itemize}
+\textbf{Add/Update MX record:} 
+\begin{itemize}
+\item redirect all mail to own servers to steal important information 
+\item add another mx record with subdomain to use in phishing scam 
+\item add an mx record with email server configured to by pass domain verification required for SSL certificates
+
+\end{itemize}
+
+\textbf{Add/Update delegation:}
+

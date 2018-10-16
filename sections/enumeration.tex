@@ -29,3 +29,5 @@ We investigate propagation between primary and secondary name servers. For each 
 In our second experiment, we targeted only secondary servers. If configured correctly, secondary servers are not allowed to update zones. However, a secondary server can forward an update to its primary server. If misconfigured, the primary server can accept the update as coming from a legitimate source even if the server is not directly vulnerable to injects coming from the outside.  The number of poisoned primary servers got decreased significantly to only 829. However, the number of secondary servers rose to 57299. It corresponds to ~0.27 propagation rate. 
 
 We queried all the servers after additional 12h and 24h. In all cases, the total number of poisoned servers decreases slightly over time. However, apart from disappearing entries, we also observed a small number of new entries that appeared in those later scans. This is due secondary servers pulling updates from master servers (when targeting primary servers) and delayed processing of forwarded updated (when targeting secondary servers). 
+
+\subsection{Fingerprinting of vulnerable name servers}

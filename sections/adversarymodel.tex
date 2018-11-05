@@ -1,7 +1,11 @@
 \section{Adversary Model}
-In this section, we explore the attacks that can be carried out by the adversary. We explain our infrastructure which we used to carry out attack on our victim. Finally, we present the taxonomy of attacks with discussion on their viability, stealthiness and  implications for the domain owners.
+%%In this section, we explore the attacks that can be carried out by the adversary. We explain our infrastructure which we used to carry out attack on our victim. Finally, we present the taxonomy of attacks with discussion on their viability, stealthiness and  implications for the domain owners.
+
+In this section, we present the taxonomy of attacks using zone poisoning vulnerability. We discuss the viability and stealthiness of these attacks and also explain the implications for the domain owners.
 
 \subsection{Infrastructure Setup}
+
+
 \textbf{Adversary Configuration:} Depending on the type of attack, different configurations might be required. In our setup, we assume our adversary has an access to compromised machine with public IP address. The adversary will require Dynamic DNS update utility \texttt{nsupdate} to modify the zone of our victim. Email server with forwarding is also required for more sophisticated attacks explained latter. 
 
 \textbf{Victim Configuration:} Our victims are operating  DNS software, with BIND software. In order for the adversary to modify the records victim servers should also be vulnerable with non-secure update of records explained in previous section. In our example victim is running domain \texttt{example.com}. 

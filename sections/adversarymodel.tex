@@ -1,24 +1,37 @@
 \section{Adversary Model}
 %%In this section, we explore the attacks that can be carried out by the adversary. We explain our infrastructure which we used to carry out attack on our victim. Finally, we present the taxonomy of attacks with discussion on their viability, stealthiness and  implications for the domain owners.
 
-In this section, we present the taxonomy of attacks using zone poisoning vulnerability. We discuss the viability and stealthiness of these attacks and also explain the implications for the domain owners.
+In this section, we present the taxonomy of attacks by our adversary by DNS dynamic updates on vulnerable slave servers. We discuss the viability and stealthiness of these attacks and also explain the implications for the domain owners.
+
+%using zone poisoning vulnerability. We discuss the viability and stealthiness of these attacks and also explain the implications for the domain owners.
 
 \subsection{Infrastructure Setup}
 
+In order to explain the adversary model, we set up our infrastructure comprising of two servers. A DNS slave server that is vulnerable to receive  dynamic zone updates (victim) without authentication from any authoritative server. The second server will act as an adversary to update the zone files of our victim.  We explain these configurations in detail below. 
 
-\textbf{Adversary Configuration:} Depending on the type of attack, different configurations might be required. In our setup, we assume our adversary has an access to compromised machine with public IP address. The adversary will require Dynamic DNS update utility \texttt{nsupdate} to modify the zone of our victim. Email server with forwarding is also required for more sophisticated attacks explained latter. 
 
-\textbf{Victim Configuration:} Our victims are operating  DNS software, with BIND software. In order for the adversary to modify the records victim servers should also be vulnerable with non-secure update of records explained in previous section. In our example victim is running domain \texttt{example.com}. 
+\textbf{Adversary Configuration:} Depending on the type of attack, different configurations might be required. In our setup, we assume our adversary has access to the compromised machine with a public IP address. The adversary will also require Dynamic DNS update utility \texttt{nsupdate} to modify the zone of our victim. Furthermore, for more sophisticated attacks other services like email server and webserver are required. %An email server with forwarding is also required for more sophisticated attacks explained later. EDIT
 
+\textbf{Victim Configuration:} Our victim server is running apache bind software. For the adversary to modify the records victim servers should also be vulnerable with the non-secure update of records explained in the previous section. We assume our victim is hosting a website \texttt{example.com}, which is protected by SSL certificate. The victim server might also have a mail server configured with the mx record configured in the zone file.  
 
 \subsection{Taxonomy of Attacks}
+We define the attacks by the adversary in the following three categories. 
+%We present the details of the following three types of attacks by the adversary and discuss the viability and stealthiness of these attacks. We also analyze the implications of these attacks on our victim
 
-In a broader sense we can divide the attacks in two main categories a) Denial of Service (DoS) attack and b) man-in-the-middle (MITM) attack. In the first type of attack the adversary will be able to temporary disrupt the service of the victim. It is much easier to execute with limited stealthiness, as victim would notice the unresponsive domain and would be able to quickly fix the configuration. On the other hand, MITM attack would requires more sophistication from the adversary while being more stealthy and difficult to detect. In this section we present details of each of the attacks with our configuration 
+\begin{itemize}
+\item \textbf{Denial of Service (DoS) attack:} In the DoS attack the adversary will be able to disrupt the service of the victim temporarily. It is much easier to execute with limited stealthiness, as the victim would notice the unresponsive domain and would be able to fix the configuration quickly. 
 
-\subsubsection{Denial of Service (DoS) Attacks} 
-The DoS attack will only cause limited disruption in the service until the victim gets notified. However, these types of attacks can result in financial losses due to domain downtime or loss of customers, which might move to competitors. The adversary can cause DoS attack using one of the following records. 
 
-\textbf{Deletion of A record of domain/sub-domain:} The adversary can delete A record with command \texttt{update delete example.com A} using nsupdate. This would delete the domain and corresponding IP address of example.com from zone file, resulting in downtime of the traffic. 
+\item \textbf{Man-in-the-Middle (MITM) attack:} MITM attack requires more sophistication from the adversary while being more stealthy and difficult to detect. In this type of the attack, our adversary will comprise the victim zone file and redirect traffic to its server and then back to the victim without getting detected. It can be used to capture the traffic between victim server and its customers.  
+
+\item \textbf{Domain exploitation attack:} Finally, the adversary might be able to add domains which he can then use for either phishing or stealing information from the victim.  
+\end{itemize}
+
+
+\subsubsection{Denial of Service (DoS) Attack} 
+The DoS attack will only cause limited disruption in the service until the victim gets notified. However, these types of attacks can result in financial losses due to domain downtime or loss of customers. The adversary can cause a DoS attack using one of the following methodologies. 
+
+\textbf{Deletion of A record of domain/sub-domain:} The adversary can delete A record with \texttt{nusupdate} utility command \texttt{update delete example.com A} using nsupdate. This would delete the domain and corresponding IP address of example.com from zone file, resulting in downtime of the traffic. 
 
 \textbf{Deletion of MX records:} Similarly, adversary can also delete MX record which will not only disrupt email service but also hinder any abuse messages sent to victim.  
 
@@ -31,7 +44,17 @@ The DoS attack will only cause limited disruption in the service until the victi
 \subsubsection{Man-in-the-middle (MITM) Attacks}
 The second type of attack that adversary can utilize is MITM attack. These attacks can be more sophisticated and harder to detect. 
 
-\textbf{Add/Update of A record to own server:}
+\textbf{Update of A records:}
+Adversary can update the A records in the zone file of the victim and change IP address to its compromised machine. In this way the traffic directed towards the victim will be redirected towards the adversary. If the adversary acts as a proxy server it can gain useful information about the customers of the victims. For instance, the number of customers, geo-location based on IP addresses and pages that were visited by the customers. However, for a more sophisticated attack the adversary can setup a phishing website to steal all the personal information of customers of our victim. He can then forward the collected information back to the customer for an increase stealthiness. 
+
+\textbf{Update of MX records:} 
+If the victim runs a mail server, adversary can change the MX record of the 
+
+%and map its own IP address for the domain. In this case the traffic for his server will be redirected towards to the adversaries server. However, the victim or its customers would be able to detect the outage. If the adversary run a phishing website similar to the victim, he might be able to successfully steal customer information. Similarly, adversary will also be able to build a completely new sub-domain of our victim legitimate domain. He can then use the sub-domain to collect 
+
+
+
+
 \begin{itemize}
 \item redirect traffic for disruption
 \item add a subdomain and redirect info after stealing 

@@ -1,7 +1,7 @@
 \section{Background}
 
 
-In this section, we introduce the necessary background about the dynamic updates in the domain name system and its security considerations.
+In this section, we introduce the necessary background about the dynamic updates in DNS, its security considerations and common software implementations.
 
 \subsection{Brief History}
 
@@ -9,7 +9,7 @@ The basic specification of the domain name system was introduced over 30 years a
 Before then, host name to address mappings were maintained by the Network Information Center (NIC) in a single file called \texttt{HOSTS.TXT} and distributed by all hosts using FTP \cite{rfc952,rfc953}.
 %
 The DNS protocol initially supported queries of a statically configured database that was updated manually as it was not expected to change rapidly \cite{rfc1034}. 
-However, with the introduction of the Dynamic Host Configuration Protocol (DHCP) \cite{rfc2131}, which allows to dynamically assign an IP address to each device on a network, the automatic reconfiguration mechanism for DNS  became also essential.
+However, with the introduction of the Dynamic Host Configuration Protocol (DHCP) \cite{rfc2131}, which allows to dynamically assign an IP address to each device on a network, the automatic reconfiguration mechanism for DNS  became essential.
 
 \begin{figure}[!ht]
 \centering
@@ -30,7 +30,7 @@ Due to the distributed nature of the domain mane system and the proliferation of
 
 The dynamic updates have been described in RFC 2136 \cite{rfc2136}. 
 The specification supports all DNS record types.
-Therefore, a client can update, add or delete any type of record, including \texttt{A}, \texttt{AAAA}, \texttt{NS}, or \texttt{TXT}.
+Therefore, a client can update, add or delete almost any type of record, including \texttt{A}, \texttt{AAAA}, \texttt{NS}, or \texttt{TXT}.
 It is often used %as an extension of
 in combination with the DHCP protocol, which can be configured not only as a mechanism for allocation of network addresses to Internet hosts but also to dynamically update both \texttt{A} and \texttt{PTR} (pointer or reverse DNS) resource records in the DNS server %on a client's behalf 
 on behalf of its clients (cf.~\autoref{fig_dhcp}).
@@ -98,6 +98,20 @@ The pressing need for DNS dynamic updates and the delayed introduction of the ro
 
 The common implementations of the DNS software, such as the open source Linux BIND \cite{bind} or the Microsoft Server DNS support vulnerable configurations, such as accepting requests from all hosts.
 Some are vulnerable by default.
-To date, all versions of  the Microsoft Server DNS support either an Active Directory--integrated zone, allowing only secure updates using extended TSIG or a standard primary DNS configuration that supports \textit{only} non-secure dynamic updates.
-Interesting, Microsoft is aware of the vulnerability and informs the users willing to setup a non-secure implementation that ``Allowing nonsecure dynamic updates is a significant security vulnerability because updates can be accepted from untrusted sources.''
+
+Microsoft Server supports two configurations of a DNS server: an active directory--integrated or a standard primary zone.
+To date, both versions support vulnerable to zone poisoning configurations.
+The former allows either ``secure only" updates using extended TSIG or ``nonsecure and secure'' updates, whereas the latter configuration supports \textit{only} ``nonsecure and secure''  updates.
+Microsoft is aware of the vulnerability and informs the users willing to setup a non-secure implementation that ``Allowing nonsecure dynamic updates is a significant security vulnerability because updates can be accepted from untrusted sources.''
 However, it remains unclear why the vulnerable version is still supported in the latest production version of the software--over 20 years after the initial release of the RFC specification.
+
+Open source DNS software such as BIND of PowerDNS also support non-secure dynamic updates: an administrator may configure IP ranges that are allowed to perform DNS updates, in particular  using a BIND's built-in argument ``any'', or ``0.0.0.0/0'', which means that all ranges are accepted to make DNS updates. 
+Both implementations support DNS update forwarding.  
+If a slave server receives a DNS dynamic update for a zone for which it is authoritative and the update forwarding is enabled then the request will be forwarded to and processed by the master server.
+
+
+\begin{comment}
+open source DNS software, 
+
+If a slave for a zone receives a DDNS update for a zone for which it is authoritative, it will not update its zone data directly. It will either discard it, or it will forward it to the master. To make the slave forward the DDNS update, you need to configure allow-update-forwarding (see the Administrator Reference Manual for more detail) - this is not enabled by default.
+\end{comment}

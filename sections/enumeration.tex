@@ -6,6 +6,7 @@
 \subsection{Propagation between primary and secondary name servers - Michał}
 \begin{table}[h!]
 \begin{center}
+\caption{Propagation results. \label{tab:propagation}}
 \begin{tabular}{| c | c | c | c | c|} 
 \hline
 \textbf{Time} & \multicolumn{2}{|c|}{\textbf{Master Injects}} & \multicolumn{2}{|c|}{\textbf{Slave Injects}} \\
@@ -20,14 +21,27 @@
 \hline 
 \end{tabular}
 \end{center}
-\caption{Propagation results.}
-\label{tab:propagation}
 \end{table}
-We investigate propagation between primary and secondary name servers. For each vulnerable domain we prepared a list of primary and secondary name servers. Table \ref{tab:propagation} summarizes the results. In the first experiment, we sent injects only to primary servers. Depending on the configuration, primary servers can push new entries to secondary servers right away or wait for secondary servers to pull the changes (secondary servers should do it at least once a day). The attack ended up affecting 16911 primary servers that directly pushed updated to 23474 secondary servers. It means that on average, each infected primary server poisoned additional ~1.4 secondary servers.
+We investigated propagation of injected records between primary and secondary name servers and \textit{vice versa}. \textcolor{red}{Why we're doing it?}
+For each vulnerable domain we prepared a list of primary and secondary name servers based on actively queried \texttt{NS} and \texttt{SOA} records. 
+In the first experiment, we sent injects only to primary servers and queried primary and secondary servers 3 times within 24 hours. 
+Depending on the configuration, primary servers can push new entries to secondary servers right away or wait for secondary servers to pull the changes (secondary servers should do it at least once a day). 
+Table \ref{tab:propagation} summarizes the results.
+%The attack directly affected 16,911 primary servers that immediately pushed updates to 23,474 secondary servers. 
+The attack directly affected 17,092 primary servers that pushed updates to 23,920 secondary servers within one day (23,474 of which were affected immediately). 
+%It means that on average, each infected primary server poisoned additional ~1.4 secondary servers.
 
+In our second experiment, we targeted only secondary servers. 
+%If configured correctly, secondary servers are not allowed to update zones. However, a 
+The secondary server can be configured to forward an update to its primary server, which updates the zone. 
+%If misconfigured, 
+In such a scenario, the primary server can accept the update as coming from a legitimate source even if the primary server may not be directly vulnerable to injects coming from unauthorized requestors.  
+The number of poisoned secondary servers rose to 57,299. 
+\textcolor{red}{Why so many? Maybe some manual analysis will reveal some interesting examples/trends from which we can hypothesize or maybe even make general conclusions?}
+However, the number of affected primary servers got decreased significantly to only 829, suggesting that update forwarding is not enabled. 
+%It corresponds to ~0.27 propagation rate. 
+ \textcolor{red}{Lessons learned at the end + nice table (see Table III) with less results (maybe aggregated after 24h) and more detailed caption + more analysis of the data: maybe some manual analysis and examples that could give the intuition behind the results. For example, why we managed to infect only 23k secondary by injects to primary, while we managed to make injects to 57K secondary directly. Maybe for a given domain we have more parties that provide authoritative information? What are those secondary servers that did not get updated after poisoning the primary and possibly why?}
 
-In our second experiment, we targeted only secondary servers. If configured correctly, secondary servers are not allowed to update zones. However, a secondary server can forward an update to its primary server. If misconfigured, the primary server can accept the update as coming from a legitimate source even if the server is not directly vulnerable to injects coming from the outside.  The number of poisoned primary servers got decreased significantly to only 829. However, the number of secondary servers rose to 57299. It corresponds to ~0.27 propagation rate. 
-
-We queried all the servers after additional 12h and 24h. In all cases, the total number of poisoned servers decreases slightly over time. However, apart from disappearing entries, we also observed a small number of new entries that appeared in those later scans. This is due secondary servers pulling updates from master servers (when targeting primary servers) and delayed processing of forwarded updated (when targeting secondary servers). 
+%We queried all the servers after additional 12h and 24h. In all cases, the total number of poisoned servers decreases slightly over time. However, apart from disappearing entries, we also observed a small number of new entries that appeared in those later scans. This is due secondary servers pulling updates from master servers (when targeting primary servers) and delayed processing of forwarded updated (when targeting secondary servers). 
 
 \subsection{Fingerprinting of vulnerable name servers}

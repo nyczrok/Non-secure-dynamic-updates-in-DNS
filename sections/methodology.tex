@@ -22,7 +22,7 @@ We also removed all \texttt{NS} RRs for which name servers were listed on the Al
 (e.g. \texttt{example.com NS google.com}) as we suspected that those represent malicious resolutions \cite{Dagon,wild}.
 %
 %
-For the total XX, YY, and ZZZ unique domains in the aggregated datasets (cf. Table \ref{tab:data}), we enumerated all combinations of the corresponding name servers and their IP addresses, and finally created three ``hitlists'' of \textit{$<$domain, NS IP address$>$} pairs, which were further used in three measurement campaigns. 
+For the total 327 M, 353 M, and 35 M unique domains in the aggregated datasets (cf. Table \ref{tab:data}), we enumerated all combinations of the corresponding name servers and their IP addresses, and finally created three ``hitlists'' of \textit{$<$domain, NS IP address$>$} pairs, which were further used in three measurement campaigns. 
 
 
 
@@ -33,8 +33,8 @@ For the total XX, YY, and ZZZ unique domains in the aggregated datasets (cf. Tab
 \Xhline{2\arrayrulewidth}
 \#  & \textbf{\textit{Global 1}} & \textbf{\textit{Global 2}} & \textbf{\textit{Subdomains}}\\
 \hline
-Domains & 327,688,011 &  & 35,382,217 \\
-NS (IP addresses) &  &  & 722,989 \\
+Domains & 327,688,011 & 353,870,510 & 35,382,217 \\
+NS (IP addresses) & 3,448,272 & 3,855,615 & 722,989 \\
 Domain--NS IP pairs & 3,277,097,568 & 5,032,117,394 & 104,955,041\\
 \Xhline{2\arrayrulewidth}
  \end{tabular}
@@ -43,5 +43,21 @@ Domain--NS IP pairs & 3,277,097,568 & 5,032,117,394 & 104,955,041\\
 
 
 
-\subsection{Ethical considerations}
 \subsection{Active scans}
+
+In order to test for the vulnerable setup, we have developed a scanner capable of sending DNS dynamic updates as defined in the relevant RFC 2136~\cite{rfc2136}.
+The scanner makes an attempt to add a new \texttt{A} RR to the zone file, associating a new subdomain with the IP address of our web server.
+The former is composed of an existing domain name and an additional suffix, i.e. \url{research}.
+If a given domain name is \url{onlineshopping.com} then the scanner will try to add \url{research.onlineshopping.com}.
+On our web server we host a website that describes the project, the problem of non-secure DNS dynamic updates and necessary steps to correctly configure the two most vulnerable configurations (Microsoft DNS and BIND). 
+Finally, it also provides the possibility to opt-out mechanism from further scans. 
+%
+Once the DNS dynamic update is sent, we first verify if a given zone file is vulnerable by analyzing server's response to an update.
+Upon receiving an \texttt{UDPATE} request, a server may signal \texttt{FORMERR} or \texttt{NOTIMP} when the request is not recognized or not implemented. 
+If a hardware error or an out-of-memory condition takes place, the server sends back \texttt{SERVFAIL} and restores the zone to its state before this transaction \cite{rfc2136}.
+The \texttt{REFUSED} response means that the server refuses to perform the operation for security or policy reasons, whereas \texttt{NOERROR} message may indicate a successful update.
+To undoubtedly confirm a vulnerability we perform an active DNS lookup to resolve the subdomain to our web server’s IP address. 
+If this succeeds, then the vulnerability is present. 
+Finally, we remove the test DNS record by sending a \textit{delete} request and then try to resolve it again to confirm the removal.
+
+\subsection{Ethical considerations}

@@ -26,9 +26,6 @@ For the total XX, YY, and ZZZ unique domains in the aggregated datasets (cf. Tab
 
 
 
-
-
-
 \begin{table}
   \caption{Summary of the aggregated DNS data \label{tab:data}}
  \centering
@@ -42,87 +39,6 @@ Domain--NS IP pairs & 3,277,097,568 & 5,032,117,394 & 104,955,041\\
 \Xhline{2\arrayrulewidth}
  \end{tabular}
 \end{table}
-
-
-\begin{comment}
--> IP of an ns server is not an IP
--> if ns server is an IP then cp ns -> ip
--> filter out reserved networks
--> filter out networks thet the owners asked to filter out (ip in the opt-out list)
-    /data/personal/maciej/SIGCOMM_DDNS/opt-out
--> ns or domain in the opt-out list
-    /data/personal/maciej/SIGCOMM_DDNS/opt-out
--> ns servers are in Alexa
-\end{comment}
-
-
-
-\begin{comment}
-
-To measure the prevalence of non-secure configurations, we collected data for two samples: a random sample of 1\% of the domain space and the Alexa top 1 million domains (or Alexa 1M) \cite{alexa}.
-
-First, we extracted %\texttt{A} and \texttt{NS} RRs for 
-all domains observed in two complementary datasets between Jan 2015 and Jan 2016:~\textit{i)} DNSDB that is a large passive DNS database fed by hundreds of sensors across the world, operated by Farsight Security \cite{dnsdb}, which generously provided access to us and \textit{ii)} Project Sonar Data Repository obtained though %MK2: DNS 
-\texttt{ANY} RR requests,
-%MK2: requests made with record type \texttt{ANY},
-made available by Rapid7 Labs \cite{scansio}.
-
-%In total, we collect XX unique domains seen in DNSDB over 13 months between Jan 2015 and Jan 2016 and obtained though active measurements between Jan 31, 2015 and Feb 20, 2016 by Rapid7 Labs. 
-%We associate domains with the corresponding name servers (YY) and their IP addresses (ZZ). 
-From the total 286,788,250 unique domains in the set, we randomly sampled 1\%. For that sample and for the Alexa 1M, we enumerated all observed combinations of name servers and their IP addresses in both datasets: over 27 and 7 million, respectively (cf. Table \ref{tab:dataset}). The long period of observation and the fact that DNSDB contains many entries that are poisoned either maliciously \cite{wild,Dagon} or unintentionally \cite{incorrect}, means we expected a lot of IP addresses on the list to be obsolete, but we wanted to find as many as possible.
-
-We performed the vulnerability assessment against the random sample on Mar 30, 2016 and against the Alexa 1M on Apr 10, 2016. For each domain, we sent an \texttt{UPDATE} request directly to all IP addresses on the list. As expected, many did not respond. Next to obsolete NS information, this can also indicate network filtering and other policies at work. We received responses from 6.0 million (random sample) and 2.3 million (Alexa 1M) name servers (see Table \ref{tab:response}).
-
-\begin{comment}
-For the purpose of our study, we collect  second-level domain names and  name servers for those zones. 
-%
-We use DNSDB \cite{dnsdb} to extract \texttt{A} and \texttt{NS} RRs.
-DNSDB is a large passive DNS database fed by hundreds of sensors across the world, operated by Farsight Security, which generously provided access to us.
-%
-We collect 286,788,250 unique domains over 13 months between Jan 2015 and Jan 2016. 
-We further associate domains with the corresponding name servers (9,531,352) and their IP addresses. 
-We enrich the data with a collection of \texttt{A} and \texttt{NS} RRs obtained though active measurements performed between Jan 31, 2015 and Feb 20, 2016 by Rapid7 %MK2: Labs 
-\cite{scansio}.
-%MK2: After filtering all \texttt{.arpa} domains, in total, we obtain 2,786,634,729 second-level domains and IP address corresponding to NS server. %($2^{nd}$--NS--IP) triples.
-
-In our preliminary study, we perform vulnerability scans against a random 1\% sample of the domain space (2,865,393 domains) and the Alexa Top 1 Million (or Alexa 1M) \cite{alexa} domains (947,823 domains in our dataset). 
-For each domain we send an \texttt{UPDATE} request directly to all IP addresses of authoritative name servers. In total, we send 27,499,061 and 7,368,659 DNS packets for two datasets, respectively.
-%
-%MK2: Table \ref{tab:dataset} summarizes datasets used in our study.
-Table \ref{tab:dataset} summarizes our datasets.
-
-\subsection{Dataset \label{sec:dataset}}
-We have measured the prevalence of non-secure servers for a random 1\% sample of the domain space %MK2: (2,865,393 domains) 
-and the Alexa Top 1 Million domains (947,823 domains in our dataset WHY LESS THAN 1M?) \cite{alexa} (Table \ref{tab:dataset}).
-
-%For the purpose of our study, we collect  second-level domain names and  name servers for that zones. 
-%
-The random sample is drawn from a set of 286,788,250 unique $2^{nd}$ level domains observed between January 2015 and January 2016 by DNSDB, a large pDNS database fed by hundreds of sensors across the world, operated by Farsight Security, which generously provided access to us. 
-
-For each domain, we extract %MK2: DNS \texttt{A} and \texttt{NS} records \cite{dnsdb}. 
-\texttt{A} and \texttt{NS} RRs \cite{dnsdb}. 
- % for that zones.
-We performed %MK2: the first DNS dynamic update 
-the vulnerability scans for the random sample on March 30, 2016 and for the Alexa 1M domains on April 10, 2016.
-
-%MK2: It is the largest, most proven real-time and historical collection of passive DNS data available [THIS SOUNDS TOO MUCH LIKE A SALES PITCH, ANY SUPPORT FOR THIS CLAIM?]
-%
-%We collect 286,788,250 unique %MK2: $2^{nd}$ level domain names 
-%domains over 13 months between Jan 2015 and Jan 2016. 
-%MK2: We further associate domains with the corresponding name servers (9,531,352), which are assumed to provide authoritative information, and their IP addresses. 
-We further associate domains with the corresponding name servers (9,531,352) and their IP addresses.
-We enrich the data with a collection of %MK2: DNS 
-\texttt{A} and \texttt{NS} RRs %records 
-obtained though active measurements performed %on a biweekly basis 
-between Jan 31, 2015 and Feb 20, 2016 by Rapid7 Labs ~\cite{scansio}.
-%WHAT DOES THIS ADD? UNCLEAR
-%MK2: within the project Sonar~\cite{scansio}. 
-%MK2: After filtering all \texttt{.arpa} domains, in total, we obtain 2,786,634,729 ($2^{nd}$--NS--IP) triples. 
-\end{comment}
-
-
-\end{comment}
-
 
 
 

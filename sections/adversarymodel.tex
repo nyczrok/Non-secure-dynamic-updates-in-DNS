@@ -1,7 +1,7 @@
 \section{Adversary Model}
 %%In this section, we explore the attacks that can be carried out by the adversary. We explain our infrastructure which we used to carry out attack on our victim. Finally, we present the taxonomy of attacks with discussion on their viability, stealthiness and  implications for the domain owners.
 
-In this section, we present the taxonomy of attacks by our adversary by DNS dynamic updates on vulnerable slave servers. We discuss the viability and stealthiness of these attacks and also explain the implications for the domain owners.
+In this section, we present the taxonomy of attacks by our adversary using DNS dynamic updates on vulnerable slave server. We briefly explain our setup, followed by the methodology which we used to compromise domain validation. Finally, we discuss the viability and stealthiness of these attacks and also explain the implications for the domain owners. 
 
 %using zone poisoning vulnerability. We discuss the viability and stealthiness of these attacks and also explain the implications for the domain owners.
 
@@ -13,6 +13,7 @@ In order to explain the adversary model, we set up our infrastructure comprising
 \textbf{Adversary Configuration:} Depending on the type of attack, different configurations might be required. In our setup, we assume our adversary has access to the compromised machine with a public IP address. The adversary will also require Dynamic DNS update utility \texttt{nsupdate} to modify the zone of our victim. Furthermore, for more sophisticated attacks other services like email server and webserver are required. %An email server with forwarding is also required for more sophisticated attacks explained later. EDIT
 
 \textbf{Victim Configuration:} Our victim server is running apache bind software. For the adversary to modify the records victim servers should also be vulnerable with the non-secure update of records explained in the previous section. We assume our victim is hosting a website \texttt{example.com}, which is protected by SSL certificate. The victim server might also have a mail server configured with the mx record configured in the zone file.  
+\subsection{Compromising Domain Control Validation}
 
 \subsection{Taxonomy of Attacks}
 We define the attacks by the adversary in the following three categories. 
@@ -48,26 +49,27 @@ The second type of attack that adversary can utilize is MITM attack. These attac
 Adversary can update the A records in the zone file of the victim and change IP address to its compromised machine. In this way the traffic directed towards the victim will be redirected towards the adversary. If the adversary acts as a proxy server it can gain useful information about the customers of the victims. For instance, the number of customers, geo-location based on IP addresses and pages that were visited by the customers. However, for a more sophisticated attack the adversary can setup a phishing website to steal all the personal information of customers of our victim. He can then forward the collected information back to the customer for an increase stealthiness. 
 
 \textbf{Update of MX records:} 
-If the victim runs a mail server, adversary can change the MX record of the 
+If the victim runs a mail server, adversary can also change the MX record with its own IP. The adversary in this case can store the emails of the victims and forward the emails back to the victim. If the adversary wants to run a phishing website it can also update the MX record and bypass email challenge to validate the domain. 
 
 %and map its own IP address for the domain. In this case the traffic for his server will be redirected towards to the adversaries server. However, the victim or its customers would be able to detect the outage. If the adversary run a phishing website similar to the victim, he might be able to successfully steal customer information. Similarly, adversary will also be able to build a completely new sub-domain of our victim legitimate domain. He can then use the sub-domain to collect 
 
 
 
 
-\begin{itemize}
-\item redirect traffic for disruption
-\item add a subdomain and redirect info after stealing 
-\item add a subdomain to launch a phising attack 
-\item add a domain with domain verfication using certs to show as legitimate site 
-\end{itemize}
-\textbf{Add/Update MX record:} 
-\begin{itemize}
-\item redirect all mail to own servers to steal important information 
-\item add another mx record with subdomain to use in phishing scam 
-\item add an mx record with email server configured to by pass domain verification required for SSL certificates
+%\begin{itemize}
+%\item redirect traffic for disruption
+%\item add a subdomain and redirect info after stealing 
+%\item add a subdomain to launch a phising attack 
+%\item add a domain with domain verfication using certs to show as legitimate site 
+%\end{itemize}
+%\textbf{Add/Update MX record:} 
+%\begin{itemize}
+%\item redirect all mail to own servers to steal important information 
+%\item add another mx record with subdomain to use in phishing scam 
+%\item add an mx record with email server configured to by pass domain verification required for SSL certificates
+%\end{itemize}
 
-\end{itemize}
 
-\textbf{Add/Update delegation:}
+\subsection{Domain exploitation}
 
+Finally, the adversary can exploit the domain for phishing attack. 

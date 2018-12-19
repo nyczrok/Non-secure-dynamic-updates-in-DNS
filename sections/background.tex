@@ -4,7 +4,7 @@
 In this section, we introduce the necessary background about the dynamic updates in DNS, its security considerations and common software implementations.
 
 \subsection{Brief History}
-
+\michal{Not sure if going so far back is necessary}
 The basic specification of the domain name system was introduced over 30 years ago \cite{rfc1035,rfc1034}. 
 Before then, host name to address mappings were maintained by the Network Information Center (NIC) in a single file called \texttt{HOSTS.TXT} and distributed by all hosts using FTP \cite{rfc952,rfc953}.
 %
@@ -22,7 +22,7 @@ However, with the introduction of the Dynamic Host Configuration Protocol (DHCP)
 
 \subsection{Dynamic Updates in DNS}
 %The DHCP protocol provides not only a mechanism for allocation of network addresses to Internet hosts but also can be configured to  dynamically update both the \texttt{A} and \texttt{PTR} (reverse DNS record) resource records in the DNS server on a client's behalf.
-
+\michal{Should be shortened and more to the point I guess}
 Internet services may use static IP addresses but can also dynamically change over short periods of time, on the order of hours or days \cite{gio}.
 Due to the distributed nature of the domain mane system and the proliferation of its actors such as registrars or registry operators, updates to the global domain name system may take hours to propagate. 
 %

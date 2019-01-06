@@ -13,7 +13,7 @@ In order to explain the adversary model, we set up our infrastructure comprising
 \textbf{Adversary Configuration:} Depending on the type of attack, different configurations might be required. In our setup, we assume our adversary \hl{has access to the compromised machine} \michal{It's a bit confusing to me. Does it mean, that the adversary has like ssh access? Or just that there's connectivity between both hosts? Also the Victim is not yet compromised during the setup, right?} with a public IP address. The adversary will also require Dynamic DNS update utility \texttt{nsupdate} to modify the zone of our victim. Furthermore, for more sophisticated attacks other services like email server and webserver are required. %An email server with forwarding is also required for more sophisticated attacks explained later. EDIT
 
 \textbf{Victim Configuration:} Our victim server is running apache bind software. For the adversary to modify the records victim servers should also be vulnerable with the non-secure update of records explained in the previous section. We assume our victim is hosting a website \texttt{example.com}, which is protected by SSL certificate. The victim server might also have a mail server configured with the mx record configured in the zone file.  
-\subsection{Compromising Domain Control Validation}
+
 
 \subsection{Taxonomy of Attacks}
 We define the attacks by the adversary in the following three categories. 
@@ -29,6 +29,7 @@ We define the attacks by the adversary in the following three categories.
 \end{itemize}
 
 
+
 \subsubsection{Denial of Service (DoS) Attack} 
 The DoS attack will only cause limited disruption in the service until the victim gets notified. However, these types of attacks can result in financial losses due to domain downtime or loss of customers. The adversary can cause a DoS attack using one of the following methodologies. 
 
@@ -36,8 +37,11 @@ The DoS attack will only cause limited disruption in the service until the victi
 
 \textbf{Deletion of MX records:} Similarly, adversary can also delete MX record which will not only disrupt email service but also hinder any abuse messages sent to victim.  
 
-\textbf{Deletion of NS record:} Deletion of NS record will be most disruptive for the victim as all available domains including email service will be un-accessible to victim and its users till the zone file is updated with correct records. 
+% Deletion of NS records not possible 
+%\textbf{Deletion of NS record:} Deletion of NS record will be most disruptive for the victim as all available domains including email service will be un-accessible to victim and its users till the zone file is updated with correct records. 
  % Need to check following statements...
+% Check edit of SOA records .... 
+
 
  \textbf{Deletion of delegation:} Delegated zones can be used for variety of purposes. It can be used for management of domains and subdomains or for the backup if master zone is down,  when configured as slave. If adversary successfully deletes delegation in the zone file. It would not only cause service disruption to the  domains handled by delegated server, but would also disrupt backup. 
 
@@ -70,6 +74,18 @@ If the victim runs a mail server, adversary can also change the MX record with i
 %\end{itemize}
 
 
-\subsection{Domain exploitation}
+\subsection{Domain Shadowing Attack}
 
-Finally, the adversary can exploit the domain for phishing attack. 
+Finally, the adversary can spawn the subdomains for phishing and exploit kit attacks by adding A and AAAA records to the zone files. Furthermore, the attacker can add MX record which can be useful in redirecting abuse emails to the attacker and increase the stealthiness of the attack. 
+
+\textbf{Add A record:} 
+Adversary can add  A record subdoamins with IP address pointing to the server under its control. He can spawn unlimited number of subdomains and rotate between them to evade detection. %Adversary can use the business model of the parent domain and can setup subdomains for phishing and exploit kit attack. 
+The victim would not be able to detect attack unless it is notified. Furthermore the attacker can use the reputation of the victim to by-pass blacklisting services for the exploit kit attack. Finally, when the attack is detected it might already result in blacklisting and negative comments of our victim domain which will adversely affect the reputation of our victim. 
+
+\textbf{Add NS record:}
+However, for every new subdomain he needs to connect with the victim server, which might be detected by the victim due to continues changes in zone file. In order to avoid this adversary can add delegated domain. One of the key advantage of this type of attack is that the attacker only needs to add one record in the zone file. He can then spawn many sibling shadowed domains and can rotate between them to 
+
+\textbf{ Add MX record:} 
+Mail record to compromise email based challenge .. get the abuse emails in order to avoid detection 
+
+\subsection{Compromising Domain Control Validation}

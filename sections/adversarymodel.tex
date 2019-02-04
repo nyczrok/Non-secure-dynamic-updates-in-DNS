@@ -82,8 +82,9 @@ Finally, the adversary can spawn the subdomains for phishing and exploit kit att
 Adversary can add an A records for subdoamins with IP address pointing to the server under its control in the victims zone file. He can spawn unlimited number of subdomains and rotate between them to evade detection. Adversary can use the business model of the parent domain and can setup subdomains for phishing attack. The victim would not be able to detect attack unless it is notified. Furthermore, the attacker can use the reputation of the victim's domain to by-pass blacklisting services for the exploit kit attack. It can also lead to adversely impact the reputation of the victim's domain and business after the attack is discovered by various blacklisting services.
 
 \textbf{Add Domain Delegation:}
-In order to spawn multiple subdomains and rotations between them the adversary needs to constantly update the zone file of victim. It might alert the victim because to constant changes in the file. In order to improve the stealthiness of this attack adversary can add delegated domain. It can then spawn multiple subdomains on his server without any updates to victim zone file. For example if the adversary add a delegated domain \textttt{accounts.example.com} with the command %check this 
-\texttt{nsupdate NS 10.10.10.10 accounts.example.com}. He can then spawn cs.accounts.example.com or any other sibling domains in the zone file of 10.10.10.10 server without any interaction with the victim server. 
+In order to spawn multiple subdomains and rotations between them the adversary needs to constantly update the zone file of victim. It might alert the victim because to constant changes in the file. In order to improve the stealthiness of this attack adversary can add delegated domain. It can then spawn multiple subdomains on his server without any updates to victim zone file. For example if the adversary add a delegated domain
+\textit{accounts.example.com} with the command %check this 
+\textit{nsupdate NS 10.10.10.10 accounts.example.com}. He can then spawn cs.accounts.example.com or any other sibling domains in the zone file of 10.10.10.10 server without any interaction with the victim server. 
 
 
 

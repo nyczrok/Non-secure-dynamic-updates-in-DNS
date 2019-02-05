@@ -54,6 +54,18 @@ Those results are confirmed by per-AS analysis (\autoref{fig:ip_as_pie}). AS 333
 \label{fig:tld_market}
 \end{figure}
 
+
+\begin{figure}[!hbt]
+\centering
+\includegraphics[width=1\columnwidth]{categories}
+\caption{Domains Categorization}
+\label{fig:categories}
+\end{figure}
+
+To determine the type of vulnerable domains, we perform classification using Webshrinker\footnote{\url{https://www.webshrinker.com/}}. Webshrinker uses machine learning to automatically classify domains using the IAB taxonomy\footnote{\url{https://support.aerserv.com/hc/en-us/articles/207148516-List-of-IAB-Categories}}. Out of 418,572 vulnerable domains, we were able to classify 6,175(1.5\%). \michal{How should we justify this? The rest were short-lived domains? Or domains without any content so we cannot classify?}
+The results are shown on Fig. \ref{fig:categories}. The most popular category consist of ``Non-Standard Content'' containing message boards, content servers and adult content. Surprisingly, the second most popular category is business containing several bank and government websites. We notice also a significant amount of domains belonging to educational and healthcare institutions. 
+\michal{Shall we have a more in-depth analysis of the categories?}
+
 \subsection{Popularity of affected domains}
 
 Among the vulnerable domains we find 5089 domains present on Alexa 1M list in a period between April 2015 and November 2018. The most popular affected domains reached 266th place on the list. Fig. \ref{fig:domains_cdf} presents cumulative distribution function of the positions reached  by the affected domains on the Alexa 1M list. 

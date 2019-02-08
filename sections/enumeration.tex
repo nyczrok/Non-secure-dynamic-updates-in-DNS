@@ -53,7 +53,7 @@
 
 To investigate the vulnerability of different types of servers, we repeat our tests targeting different groups of DNS servers. For each vulnerable domain we prepared a list of primary and secondary name servers based on actively queried \texttt{NS} and \texttt{SOA} records. In the first experiment, we sent injects only to primary servers and queried primary and secondary servers right away and after 24 hours. In our second experiment, we targeted the secondary servers uniquely and again queried all the servers right away and after 24 hours. 
 
-The majority of the domains can be attacked using both their primary and secondary servers(Fig. \ref{fig_domains_vulnerability}). However, more than 24,000 domains were vulnerable when attacked using one type of servers. Surprisingly, we discovered a similar amount of domains having vulnerable primary and secondary servers. 
+The majority of the domains can be attacked using both their primary and secondary servers(Fig. \ref{fig:domains_vulnerability}). However, more than 24,000 domains were vulnerable when attacked using one type of servers. Surprisingly, we discovered a similar amount of domains having vulnerable primary and secondary servers. 
 
 \begin{table}[!htbp]
 \centering

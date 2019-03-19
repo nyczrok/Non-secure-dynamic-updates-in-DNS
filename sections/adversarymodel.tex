@@ -1,23 +1,44 @@
 \section{Adversary Model}
 %%In this section, we explore the attacks that can be carried out by the adversary. We explain our infrastructure which we used to carry out attack on our victim. Finally, we present the taxonomy of attacks with discussion on their viability, stealthiness and  implications for the domain owners.
 
-In this section, we present the taxonomy of attacks by our adversary using DNS dynamic updates on vulnerable slave server. We briefly explain our setup, followed by the methodology which we used to compromise domain validation. Finally, we discuss the viability and stealthiness of these attacks and also explain the implications for the domain owners. 
+%MK: In this section, we present the taxonomy of attacks by our adversary using DNS dynamic updates on vulnerable slave server. 
+In this section, we present the taxonomy of attacks by an adversary on a vulnerable authoritative name server.
+We refer to the attacks exploiting non-secure DNS dynamic updates as to \textit{zone poisoning}.
+%
+We first explain our setup to perform lab experiments, followed by 
+presenting the attack vectors. 
+%the methodology which we used to %compromise domain validation to obtain a valid digital certificate for a vulnerable domain.
+%confirm different attack vectors.
+Finally, we discuss the viability and stealthiness of these attacks and %MK: also explain the implications for the domain owners. 
+the implications for owners of vulnerable domains.
 
 %using zone poisoning vulnerability. We discuss the viability and stealthiness of these attacks and also explain the implications for the domain owners.
 
 \subsection{Infrastructure Setup}
 
-In order to explain the adversary model, we set up our infrastructure comprising of two servers. A DNS server that is vulnerable to receive  dynamic zone updates (victim) without authentication from any authoritative server. The second server will act as an adversary to update the zone files of our victim.  We explain these configurations in detail below. 
+In order to explain the adversary model, we set up our infrastructure %comprising of 
+composed of two servers. 
+%MK: A DNS server that is vulnerable to receive  dynamic zone updates (victim) without authentication from any authoritative server. The second server will act as an adversary to update the zone files of our victim.  We explain these configurations in detail below. 
 
 
-\textbf{Adversary Configuration:} 
-
-Depending on the type of attack, different configurations might be required. In our setup, we assume our adversary has already scanned for vulnerable servers and knows the public IP address of the victim. The adversary will also require Dynamic DNS update utility \texttt{nsupdate} to modify the zone of the victim. Furthermore, for more advanced attacks the attacker might need to set up a mail, web or a DNS server.
+\textbf{Adversary configuration:} Depending on the type of attack, different configurations might be required. 
+In our setup, we assume that our adversary has already scanned for vulnerable 
+resources and knows the domain name and its authoritative name server.
+%MK: servers and knows the public IP address of the victim. 
+The adversary will also require the standard dynamic DNS update utility \texttt{nsupdate}\footnote{%Dynamic DNS update utility:
+\url{https://linux.die.net/man/8/nsupdate}} (or another dedicated software) to modify the zone of the victim. %Furthermore, f
+For more advanced attacks the adversary might need to set up a mail, a web or a name server.
 %Depending on the type of attack, different configurations might be required. In our setup, we assume our adversary has already scanned for vulnerable servers and knows the public IP address of our victim. 
 
 %\hl{has access to the compromised machine} \michal{It's a bit confusing to me. Does it mean, that the adversary has like ssh access? Or just that there's connectivity between both hosts? Also the Victim is not yet compromised during the setup, right?} with a public IP address. The adversary will also require Dynamic DNS update utility \texttt{nsupdate} to modify the zone of our victim. Furthermore, for more sophisticated attacks other services like email server and webserver are required. %An email server with forwarding is also required for more sophisticated attacks explained later. EDIT
 
-\textbf{Victim Configuration:} Our victim server is running apache bind software. For the adversary to modify the records victim servers should also be vulnerable with the non-secure update of records explained in the previous section. We assume our victim is hosting a website \texttt{example.com}, which is protected by SSL certificate. The victim server might also have a mail server configured with the mx record configured in the zone file.  
+\textbf{Victim configuration:} Our victim server is running BIND 9.8.4 and Apache software. 
+For the adversary to modify DNS records, the victim server is configured to allow non-secure dynamic updates %of records as explained in the previous section. 
+from anyone using the built-in argument ``any'' in the zone configuration of our domain as explained in the previous section.
+%
+We assume that our victim is hosting a website (\texttt{example.com}), 
+which is protected with an SSL certificate. 
+The victim server might also have a mail server configured with the \texttt{MX} record configured in the zone file.  
 
 
 \subsection{Taxonomy of Attacks}

@@ -3,6 +3,7 @@
 
 In this section, we introduce the necessary background about the dynamic updates in DNS, its security considerations and common software implementations.
 
+\begin{comment}
 \subsection{Brief History}
 \michal{Not sure if going so far back is necessary}
 The basic specification of the domain name system was introduced over 30 years ago \cite{rfc1035,rfc1034}. 
@@ -10,6 +11,24 @@ Before then, host name to address mappings were maintained by the Network Inform
 %
 The DNS protocol initially supported queries of a statically configured database that was updated manually as it was not expected to change rapidly \cite{rfc1034}. 
 However, with the introduction of the Dynamic Host Configuration Protocol (DHCP) \cite{rfc2131}, which allows to dynamically assign an IP address to each device on a network, the automatic reconfiguration mechanism for DNS  became essential.
+\end{comment}
+
+\subsection{Dynamic Updates in DNS}
+%The DHCP protocol provides not only a mechanism for allocation of network addresses to Internet hosts but also can be configured to  dynamically update both the \texttt{A} and \texttt{PTR} (reverse DNS record) resource records in the DNS server on a client's behalf.
+%%MK: \michal{Should be shortened and more to the point I guess}
+%%MK: Internet services may use static IP addresses but can also dynamically change over short periods of time, on the order of hours or days \cite{gio}.
+%%MK: Due to the distributed nature of the domain mane system and the proliferation of its actors such as registrars or registry operators, updates to the global domain name system may take hours to propagate. 
+%
+\textit{Dynamic updates in DNS} is a protocol extension that addresses the problem of fast changes of DNS resource records in zone files, such as an \texttt{A} record, which provides a mapping between a domain name and an IP address.
+
+The dynamic updates have been described in RFC 2136~\cite{rfc2136}. 
+%%MK: The specification supports all DNS record types.
+%%MK: Therefore, 
+A client can update, add or delete almost any type of record, including \texttt{A}, \texttt{AAAA}, \texttt{NS}, or \texttt{TXT}.
+It is often used %as an extension of
+in combination with the DHCP protocol, which can be configured %not only 
+as a mechanism for allocation of network addresses to Internet hosts but also to dynamically update both \texttt{A} and \texttt{PTR} (pointer or reverse DNS) resource records in the DNS server %on a client's behalf 
+on behalf of its clients (cf.~\autoref{fig_dhcp}).
 
 \begin{figure}[!ht]
 \centering
@@ -20,22 +39,6 @@ However, with the introduction of the Dynamic Host Configuration Protocol (DHCP)
 \label{fig_dhcp}
 \end{figure}
 
-\subsection{Dynamic Updates in DNS}
-%The DHCP protocol provides not only a mechanism for allocation of network addresses to Internet hosts but also can be configured to  dynamically update both the \texttt{A} and \texttt{PTR} (reverse DNS record) resource records in the DNS server on a client's behalf.
-\michal{Should be shortened and more to the point I guess}
-Internet services may use static IP addresses but can also dynamically change over short periods of time, on the order of hours or days \cite{gio}.
-Due to the distributed nature of the domain mane system and the proliferation of its actors such as registrars or registry operators, updates to the global domain name system may take hours to propagate. 
-%
-\textit{Dynamic updates in DNS} is a protocol extension that addresses the problem of fast changes of DNS resource records in zone files, such as an \texttt{A} record, which provides a mapping between a domain name and an IP address.
-
-The dynamic updates have been described in RFC 2136 \cite{rfc2136}. 
-The specification supports all DNS record types.
-Therefore, a client can update, add or delete almost any type of record, including \texttt{A}, \texttt{AAAA}, \texttt{NS}, or \texttt{TXT}.
-It is often used %as an extension of
-in combination with the DHCP protocol, which can be configured not only as a mechanism for allocation of network addresses to Internet hosts but also to dynamically update both \texttt{A} and \texttt{PTR} (pointer or reverse DNS) resource records in the DNS server %on a client's behalf 
-on behalf of its clients (cf.~\autoref{fig_dhcp}).
-
-
 %It supports all DNS record types, but often it is used only as an extension of the DHCP system, and in which the authorized DHCP servers register the client records in the DNS.
 
 
@@ -45,7 +48,7 @@ on behalf of its clients (cf.~\autoref{fig_dhcp}).
 %Some servers that are maintained by certain types of Internet service providers (ISPs) are likely to change their IP address over very short periods of time, 
 
 
-
+\begin{comment}
 The proposed DNS \texttt{UPDATE} message complies with the standard DNS message format (cf. RFC 1035 \cite{rfc1035}) and is defined as follows:
 \newline
 \noindent
@@ -65,22 +68,29 @@ The proposed DNS \texttt{UPDATE} message complies with the standard DNS message 
       \newline \noindent
       \texttt{|\hspace{0.005cm}Additional Data\hspace{-0.005cm} |} additional information (if any)
       \texttt{+----------------+}
+\end{comment}
 
+
+The \texttt{UPDATE} message complies with the standard DNS %message
+format (cf. RFC 1035 \cite{rfc1035}).
 The \texttt{Header} section contains the \texttt{UPDATE} opcode equal to~5. The \texttt{Zone} section must specify the zone name to update, i.e. a domain name (e.g.: \texttt{\url{example.com}}). The \texttt{Prerequisite} section can specify 
 requirements %demanded as conditions for an update in terms of a DNS zone file content 
 that must be satisfied by the DNS zone file such as existence or nonexistence of a specific resource record (RR). %, before being allowed to proceed with an update
 The \texttt{Update} section contains resource record(s) to be added to or deleted from the DNS zone (e.g.:  \texttt{\url{example.com} A 10.10.10.10}), whereas \texttt{Additional Data} section can be used to supply a server with some additional information needed to, for example,  secure DNS update~\cite{rfc2136}.
 
-When a primary master name server that supports dynamic updates receives an update request, it verifies whether all prerequisites (if any) defined by the requestor are met and whether restrictions (if any) regarding which hosts are permitted to make updates are met.
-Note that if there are no restrictions defined by the DNS authoritative name server, anyone who knows the name of the zone (e.g.: \texttt{\url{example.com}}) and the name server (e.g.: \texttt{\url{ns1.example.com}}) for that zone is capable of updating its content by sending a single UDP datagram.
-It can be tested using a standard \texttt{nsupdate} command\footnote{Dynamic DNS update utility: \url{https://linux.die.net/man/8/nsupdate}}.
+When a primary master name server that supports dynamic updates receives an update request, it verifies whether all prerequisites (if any) defined by the %requestor 
+client are met and whether restrictions (if any) regarding which hosts are permitted to make updates are met.
+Note that if there are no restrictions defined by the authoritative name server, anyone who knows the name of the zone (e.g.: \texttt{\url{example.com}}) and the name server (e.g.: \texttt{\url{ns1.example.com}}) for that zone is capable of updating its content by sending a single UDP datagram.
+%MK: It can be tested using a standard \texttt{nsupdate} command\footnote{Dynamic DNS update utility: \url{https://linux.die.net/man/8/nsupdate}}.
 %
 %
 The RFC specification also defines a case, where the request is sent to a DNS slave server that is authoritative for a given domain name.
 The update request is expected to be forwarded towards the primary DNS server that can modify the zone file.
 
 \subsection{Security Considerations}
-The method described in RFC 2136 also includes a brief discussion of the security considerations and recommends using DNS Security Extensions (DNSSEC) digital signatures covering requests to secure dynamic updates and restrict requestors to those authorized to perform them %, for example, a local DHCP server 
+The method described in RFC 2136 %also includes a brief discussion of 
+briefly discusses the security considerations and recommends using DNS Security Extensions (DNSSEC) digital signatures covering requests to secure dynamic updates and restrict %requestors 
+clients to those authorized to perform them %, for example, a local DHCP server 
 (cf. RFC~2137~\cite{rfc2137} %, superseded by RFC~3007~\cite{rfc3007}).
 and RFC~3007~\cite{rfc3007}).
 If the public key security mechanism is not implemented, an authoritative name server is expected to accept the dynamic updates only from a statically preconfigured set of IP addresses.
@@ -100,9 +110,11 @@ The common implementations of the DNS software, such as the open source Linux BI
 Some are vulnerable by default.
 
 Microsoft Server supports two configurations of a DNS server: an active directory--integrated or a standard primary zone.
-To date, both versions support vulnerable to zone poisoning configurations.
-The former allows either ``secure only" updates using extended TSIG or ``nonsecure and secure'' updates, whereas the latter configuration supports \textit{only} ``nonsecure and secure''  updates.
-Microsoft is aware of the vulnerability and informs the users willing to setup a non-secure implementation that ``Allowing nonsecure dynamic updates is a significant security vulnerability because updates can be accepted from untrusted sources.''
+To date, both versions support vulnerable to %MK: zone poisoning 
+non-secure dynamic updates configurations.
+The former allows either ``secure only" updates using extended TSIG or ``nonsecure and secure'' updates. %MK: , whereas the latter 
+Standard primary zone configuration supports \textit{only} ``nonsecure and secure''  updates.
+Microsoft is aware of the vulnerability and informs the users willing to setup a non-secure implementation that ``allowing nonsecure dynamic updates is a significant security vulnerability because updates can be accepted from untrusted sources.''
 However, it remains unclear why the vulnerable version is still supported in the latest production version of the software--over 20 years after the initial release of the RFC specification.
 
 Open source DNS software such as BIND of PowerDNS also support non-secure dynamic updates: an administrator may configure IP ranges that are allowed to perform DNS updates, in particular  using a BIND's built-in argument ``any'', or ``0.0.0.0/0'', which means that all ranges are accepted to make DNS updates. 

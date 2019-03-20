@@ -9,14 +9,15 @@ We first explain our setup to perform lab experiments, followed by
 presenting the attack vectors. 
 %the methodology which we used to %compromise domain validation to obtain a valid digital certificate for a vulnerable domain.
 %confirm different attack vectors.
-Finally, we discuss the viability and stealthiness of these attacks and %MK: also explain the implications for the domain owners. 
+%Finally, w
+We discuss the viability and stealthiness of these attacks and %MK: also explain the implications for the domain owners. 
 the implications for owners of vulnerable domains.
 
 %using zone poisoning vulnerability. We discuss the viability and stealthiness of these attacks and also explain the implications for the domain owners.
 
 \subsection{Infrastructure Setup}
 
-In order to explain the adversary model, we set up our infrastructure %comprising of 
+In order to explain the adversary model and test it in an isolated environment, we set up our infrastructure %comprising of 
 composed of two servers. 
 %MK: A DNS server that is vulnerable to receive  dynamic zone updates (victim) without authentication from any authoritative server. The second server will act as an adversary to update the zone files of our victim.  We explain these configurations in detail below. 
 
@@ -27,50 +28,67 @@ resources and knows the domain name and its authoritative name server.
 %MK: servers and knows the public IP address of the victim. 
 The adversary will also require the standard dynamic DNS update utility \texttt{nsupdate}\footnote{%Dynamic DNS update utility:
 \url{https://linux.die.net/man/8/nsupdate}} (or another dedicated software) to modify the zone of the victim. %Furthermore, f
-For more advanced attacks the adversary might need to set up a mail, a web or a name server.
+For more advanced attacks the adversary might need to set up a mail, a web or a DNS server.
 %Depending on the type of attack, different configurations might be required. In our setup, we assume our adversary has already scanned for vulnerable servers and knows the public IP address of our victim. 
 
 %\hl{has access to the compromised machine} \michal{It's a bit confusing to me. Does it mean, that the adversary has like ssh access? Or just that there's connectivity between both hosts? Also the Victim is not yet compromised during the setup, right?} with a public IP address. The adversary will also require Dynamic DNS update utility \texttt{nsupdate} to modify the zone of our victim. Furthermore, for more sophisticated attacks other services like email server and webserver are required. %An email server with forwarding is also required for more sophisticated attacks explained later. EDIT
 
-\textbf{Victim configuration:} Our victim server is running BIND 9.8.4 and Apache software. 
-For the adversary to modify DNS records, the victim server is configured to allow non-secure dynamic updates %of records as explained in the previous section. 
-from anyone using the built-in argument ``any'' in the zone configuration of our domain as explained in the previous section.
+\textbf{Victim configuration:} Our victim server is running BIND 9.8.4 DNS and Apache HTTP software. 
+%MK: For the adversary to modify DNS records, t
+The victim server is configured to allow non-secure dynamic updates %of records as explained in the previous section. 
+from anyone using the built-in argument ``any'' in the zone configuration of our domain (\url{example.com}), as explained in the previous section.
 %
-We assume that our victim is hosting a website (\texttt{example.com}), 
+%We assume that o
+Our victim is hosting a website, 
 which is protected with an SSL certificate. 
-The victim server might also have a mail server configured with the \texttt{MX} record configured in the zone file.  
+The victim server might also have a mail server configured with the corresponding \texttt{MX} record defined in the zone file.  
 
 
 \subsection{Taxonomy of Attacks}
-We define the attacks by the adversary in the following three categories. 
+We define the attacks by the adversary in the following three categories and present the tradeoff between viability and stealthiness of each attack:
+
 %We present the details of the following three types of attacks by the adversary and discuss the viability and stealthiness of these attacks. We also analyze the implications of these attacks on our victim
 
 \begin{itemize}
-\item \textbf{Denial of Service (DoS) attack:} In the DoS attack the adversary will be able to disrupt the service of the victim temporarily. It is much easier to execute with limited stealthiness, as the victim would notice the unresponsive domain and would be able to fix the configuration quickly. 
+\item \textbf{Denial of Service (DoS) attack:} In the DoS attack the adversary will be able to disrupt a service (e.g.: web, mail, domain, ssh, etc.) of the victim temporarily. 
+It is much easier to execute with limited stealthiness, as the victim would notice the unresponsive domain and would be able to fix the configuration quickly. 
 
 
-\item \textbf{Man-in-the-Middle (MITM) attack:} MITM attack requires more sophistication from the adversary while being more stealthy and difficult to detect. In this type of the attack, our adversary will comprise the victim zone file and redirect traffic to its server and then back to the victim without getting detected. It can be used to capture the traffic between victim server and its customers.  
+\item \textbf{Man-in-the-Middle (MITM) attack:} MITM attack requires more sophistication from the adversary while being more stealthy and difficult to detect. In this type of the attack, our adversary will %comprise 
+poison the victim's zone file and redirect traffic to its server and then back to the victim without getting detected. It can be used to capture the traffic between the victim's server and its clients. %customers.  
 
-\item \textbf{Domain shadowing attack:} Finally, the adversary might be able to spawn malicious domains which he can then use for exploit kits, phishing and stealing information from the victim. Domain shadowing attacks are more stealthy in nature as the subdomains inherit the trust of the parent domain which enables them to evade countermeasures based on domain reputation or blacklisting systems. The attacker can spawn multiple subdomains at no cost and can rotate between them to evade detection. Furthermore in Section~\ref{} we explain how attackers can by-pass domain control validation in order to setup SSL certificates. 
+\item \textbf{Domain shadowing attack:} %Finally, t
+The adversary might also be able to spawn malicious subdomains which she can then use for exploit kits, malware, phishing and stealing information from the victim. 
+Domain shadowing attacks~\cite{shadowing} are more stealthy in nature as the subdomains inherit the trust of the parent domain which enables them to evade countermeasures based on domain reputation or blacklisting systems. The attacker can spawn multiple subdomains at no cost and can rotate between them to evade detection. 
+
+The domain shadowing attack can be further sophisticated by by-passing domain control validation in order to setup a valid SSL certificate for a malicious subdomain.
+In Section~\ref{sec:domainvalidation} we explain the details of this attack vector.
+
+%Furthermore in Section~\ref{sec:domainvalidation} we explain how attackers can by-pass domain control validation in order to setup SSL certificates. 
 \end{itemize}
 
 
 
 \subsubsection{Denial of Service (DoS) Attack} 
-The DoS attack will only cause limited disruption in the service until the victim gets notified. However, these types of attacks can result in financial losses due to domain downtime or loss of customers. The adversary can cause a DoS attack using one of the following methodologies. 
+The DoS attack will only cause limited disruption in the service until the victim gets notified. However, these types of attacks can result in financial losses due to domain downtime or loss of customers. The adversary can cause a DoS attack using one of the following methods: %methodologies. 
 
-\textbf{Deletion of A record of domain/sub-domain:} The adversary can delete A record which will delete the domain and corresponding IP address of example.com from the zone file. It will result in downtime of the traffic. Note that adversary can also delete a subdomain with the same command. If the victim is running different services like accounts or checkout on a separate subdomain, it will partially disable part of the website and might take more time to detect. 
+\textbf{Deletion of an \texttt{A}/\texttt{AAAA} record of domain or subdomain:} The adversary can remove an \texttt{A} or \texttt{AAAA} record which will delete the mapping between the domain and the corresponding IPv4 or IPv6 address of \url{example.com} from the zone file. 
+%MK: It will result in downtime of the traffic. 
+Note that adversary can also delete a subdomain %with the same command.
+with \texttt{nusupdate} utility command ``\texttt{update delete example.com A}''. 
+%corresponding to the web, ftp, or mail service. 
+If the victim is running different services like accounts, mail, ftp, or checkout on a separate subdomain, it will partially disable a part of the website and might take more time to~detect. 
 %with \texttt{nusupdate} utility command \texttt{update delete example.com A} using nsupdate. 
 
-\textbf{Deletion of MX records:} Similarly, adversary can also delete MX record which will not only disrupt email service but also hinder any abuse messages sent to victim.  
-
+\textbf{Deletion of MX records:} Similarly, the adversary can also delete an \texttt{MX} (mail exchange) record which specifies the name of the mail server responsible for accepting email messages on behalf of a domain name.
+It will not only disrupt an email service but also hinder any abuse messages sent to the victim. 
 % Deletion of NS records not possible 
 %\textbf{Deletion of NS record:} Deletion of NS record will be most disruptive for the victim as all available domains including email service will be un-accessible to victim and its users till the zone file is updated with correct records. 
  % Need to check following statements...
 % Check edit of SOA records .... 
 
 
- \textbf{Deletion of delegation:} Delegated zones can be used for variety of purposes. It can be used for management of domains and subdomains or for the backup if master zone is down,  when configured as slave. If adversary successfully deletes delegation in the zone file. It would not only cause service disruption to the  domains handled by delegated server, but would also disrupt backup. 
+ \textbf{Deletion of zone delegation:} Delegated zones can be used for variety of purposes. It can be used for management of domains and subdomains or for the backup if master zone is down,  when configured as slave. If the adversary successfully deletes delegation in the zone file. It would not only cause service disruption to the  domains handled by delegated server, but would also disrupt a backup. 
 
 
 \subsubsection{Man-in-the-middle (MITM) Attacks}
@@ -116,7 +134,7 @@ In order to spawn multiple subdomains and rotations between them the adversary n
 
 
 
-\subsubsection{Compromising Domain Control Validation}
+\subsubsection{Compromising Domain Control Validation\label{sec:domainvalidation}}
 
 % Why domain control validation is important .. motivation 
 % WHich certs did we chose and why 

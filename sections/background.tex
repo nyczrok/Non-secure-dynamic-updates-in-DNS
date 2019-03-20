@@ -19,9 +19,9 @@ However, with the introduction of the Dynamic Host Configuration Protocol (DHCP)
 %%MK: Internet services may use static IP addresses but can also dynamically change over short periods of time, on the order of hours or days \cite{gio}.
 %%MK: Due to the distributed nature of the domain mane system and the proliferation of its actors such as registrars or registry operators, updates to the global domain name system may take hours to propagate. 
 %
-\textit{Dynamic updates in DNS} is a protocol extension that addresses the problem of fast changes of DNS resource records in zone files, such as an \texttt{A} record, which provides a mapping between a domain name and an IP address.
+\textit{Dynamic updates in DNS} is a protocol extension that addresses the problem of fast changes of DNS resource records (RRs) in zone files, such as an \texttt{A} record, which provides a mapping between a domain name and an IP address.
 
-The dynamic updates have been described in RFC 2136~\cite{rfc2136}. 
+The dynamic updates have been described in RFC 2136 \cite{rfc2136} in 1997. 
 %%MK: The specification supports all DNS record types.
 %%MK: Therefore, 
 A client can update, add or delete almost any type of record, including \texttt{A}, \texttt{AAAA}, \texttt{NS}, or \texttt{TXT}.
@@ -75,7 +75,7 @@ The \texttt{UPDATE} message complies with the standard DNS %message
 format (cf. RFC 1035 \cite{rfc1035}).
 The \texttt{Header} section contains the \texttt{UPDATE} opcode equal to~5. The \texttt{Zone} section must specify the zone name to update, i.e. a domain name (e.g.: \texttt{\url{example.com}}). The \texttt{Prerequisite} section can specify 
 requirements %demanded as conditions for an update in terms of a DNS zone file content 
-that must be satisfied by the DNS zone file such as existence or nonexistence of a specific resource record (RR). %, before being allowed to proceed with an update
+that must be satisfied by the DNS zone file such as existence or nonexistence of a specific resource record. % (RR). %, before being allowed to proceed with an update
 The \texttt{Update} section contains resource record(s) to be added to or deleted from the DNS zone (e.g.:  \texttt{\url{example.com} A 10.10.10.10}), whereas \texttt{Additional Data} section can be used to supply a server with some additional information needed to, for example,  secure DNS update~\cite{rfc2136}.
 
 When a primary master name server that supports dynamic updates receives an update request, it verifies whether all prerequisites (if any) defined by the %requestor 

@@ -1,7 +1,25 @@
 %\documentclass[conference]{IEEEtran}
-\documentclass[letterpaper,twocolumn,10pt]{article}
-\usepackage{usenix2019_v3}
+%%USENIX format
+%%\documentclass[letterpaper,twocolumn,10pt]{article}
+%%\usepackage{usenix2019_v3}
 %http://wp.internetsociety.org/ndss/wp-content/uploads/sites/25/2017/09/bare_NDSS.tex
+%CCS format
+\documentclass[sigconf]{acmart}
+\setcopyright{none}
+\settopmatter{printacmref=false} % Removes citation information below abstract
+\renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
+\pagestyle{plain} % removes running headers
+
+\hypersetup{
+    colorlinks,%
+    citecolor=blue,%\ne
+    filecolor=black,%
+    linkcolor=blue,%
+    urlcolor=blue
+}
+% end CCS
+
+
 \usepackage[utf8]{inputenc}
 
 %this package clashes with the usenix template

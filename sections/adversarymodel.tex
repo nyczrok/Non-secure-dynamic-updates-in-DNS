@@ -35,8 +35,8 @@ For more advanced attacks the adversary might need to set up a mail, a web or a 
 
 \textbf{Victim configuration:} Our victim server is running BIND 9.8.4 DNS and Apache HTTP software. 
 %MK: For the adversary to modify DNS records, t
-The victim server is configured to allow non-secure dynamic updates %of records as explained in the previous section. 
-from anyone using the built-in argument ``any'' in the zone configuration of our domain (\url{example.com}), as explained in the previous section.
+The victim name server (\url{ns1.example.com}) is configured to allow non-secure dynamic updates %of records as explained in the previous section. 
+from anyone using the built-in argument ``any'' in the zone configuration of our domain (\url{example.com}). %, as explained in the previous section.
 %
 %We assume that o
 Our victim is hosting a website, 
@@ -58,11 +58,16 @@ It is much easier to execute with limited stealthiness, as the victim would noti
 poison the victim's zone file and redirect traffic to its server and then back to the victim without getting detected. It can be used to capture the traffic between the victim's server and its clients. %customers.  
 
 \item \textbf{Domain shadowing attack:} %Finally, t
-The adversary might also be able to spawn malicious subdomains which she can then use for exploit kits, malware, phishing and stealing information from the victim. 
-Domain shadowing attacks~\cite{shadowing} are more stealthy in nature as the subdomains inherit the trust of the parent domain which enables them to evade countermeasures based on domain reputation or blacklisting systems. The attacker can spawn multiple subdomains at no cost and can rotate between them to evade detection. 
+The adversary %might also be able to 
+can also spawn malicious subdomains which she can then use for exploit kits, malware, phishing and stealing information from the victim. 
+Domain shadowing attacks~\cite{shadowing} are %more
+very stealthy in nature. 
+The subdomains inherit the trust of the parent domain which enables them to evade countermeasures based on domain reputation or blacklisting systems. 
+The adversary can %spawn 
+add multiple subdomains at no cost and can rotate between them to evade detection. 
 
 The domain shadowing attack can be further sophisticated by by-passing domain control validation in order to setup a valid SSL certificate for a malicious subdomain.
-In Section~\ref{sec:domainvalidation} we explain the details of this attack vector.
+%MK: In Section~\ref{sec:domainvalidation} we explain the details of this attack vector.
 
 %Furthermore in Section~\ref{sec:domainvalidation} we explain how attackers can by-pass domain control validation in order to setup SSL certificates. 
 \end{itemize}
@@ -70,25 +75,76 @@ In Section~\ref{sec:domainvalidation} we explain the details of this attack vect
 
 
 \subsubsection{Denial of Service (DoS) Attack} 
-The DoS attack will only cause limited disruption in the service until the victim gets notified. However, these types of attacks can result in financial losses due to domain downtime or loss of customers. The adversary can cause a DoS attack using one of the following methods: %methodologies. 
+The DoS attack will only cause limited disruption in the service until the victim gets notified and fixes the problem. However, these types of attacks can result in financial losses due to domain downtime or loss of customers. The adversary can cause a DoS attack using one of the following methods: %methodologies. 
 
-\textbf{Deletion of an \texttt{A}/\texttt{AAAA} record of domain or subdomain:} The adversary can remove an \texttt{A} or \texttt{AAAA} record which will delete the mapping between the domain and the corresponding IPv4 or IPv6 address of \url{example.com} from the zone file. 
+\textbf{Deletion of an \texttt{A}/\texttt{AAAA} record of a domain or a subdomain:} The adversary can remove an \texttt{A} or \texttt{AAAA} record which will delete the mapping between the domain and the corresponding IPv4 or IPv6 address of \url{example.com} from the zone file. 
 %MK: It will result in downtime of the traffic. 
-Note that adversary can also delete a subdomain %with the same command.
-with \texttt{nusupdate} utility command ``\texttt{update delete example.com A}''. 
+%%MK: Note that adversary can also delete a subdomain %with the same command.
+%%MK: with \texttt{nusupdate} utility command ``\texttt{update delete example.com A}''. 
+Note that adversary can also delete a subdomain, assuming that subdomains are managed by the same parent name server (\url{ns1.example.com}). 
 %corresponding to the web, ftp, or mail service. 
-If the victim is running different services like accounts, mail, ftp, or checkout on a separate subdomain, it will partially disable a part of the website and might take more time to~detect. 
+If the victim is running different services like accounts, mail, ftp, or checkout on a separate subdomain, it will %partially 
+disable a part of the website and might take more time to~detect. 
 %with \texttt{nusupdate} utility command \texttt{update delete example.com A} using nsupdate. 
 
-\textbf{Deletion of MX records:} Similarly, the adversary can also delete an \texttt{MX} (mail exchange) record which specifies the name of the mail server responsible for accepting email messages on behalf of a domain name.
+ \textbf{Deletion of a zone delegation:} 
+%
+ The parent name server (\url{ns1.example.com} in the tested case) may perform the delegation: the \url{example.com} zone to the \url{subdomain.example.com} zone maintained by the child name server (\url{ns1.subdomain.example.com}).
+ %Delegated zones can be used for variety of purposes. It can be used for management of domains and subdomains or for the backup if master zone is down,  when configured as slave. 
+ %If the adversary successfully deletes 
+ The adversary %may 
+ can delete the delegation in the zone file, i.e. the mapping between a subdomain and the corresponding child name server, or a glue record, i.e. an \texttt{A/AAAA} record providing the mapping between the name of the child server and its IP address.
+ It will cause the service disruption of the subdomain(s) (in our case \url{subdomain.example.com}) handled by the delegated server. %, but would also disrupt a backup. 
+
+
+\textbf{Deletion of an MX record:} Similarly, the adversary can also delete an \texttt{MX} (mail exchange) record (or its glue record) which specifies the name of the mail server responsible for accepting email messages on behalf of a domain name.
 It will not only disrupt an email service but also hinder any abuse messages sent to the victim. 
 % Deletion of NS records not possible 
 %\textbf{Deletion of NS record:} Deletion of NS record will be most disruptive for the victim as all available domains including email service will be un-accessible to victim and its users till the zone file is updated with correct records. 
  % Need to check following statements...
 % Check edit of SOA records .... 
 
+\textbf{Deletion, addition or modification of a \texttt{TXT} record:} Text records are extensively used for implementation of the Sender Policy Framework (SPF) \cite{spf}, Domain Keys Identified Mail (DKIM) \cite{dkim}, Domain-based Message Authentication, Reporting and Conformance (DMARC) \cite{dmarc}, or DNS-based service discovery \cite{rfc6763}.
+Due to the widespread use of the \texttt{TXT} record by a variety of services and therefore possible threats, we focus on the DoS attacks against SPF.
 
- \textbf{Deletion of zone delegation:} Delegated zones can be used for variety of purposes. It can be used for management of domains and subdomains or for the backup if master zone is down,  when configured as slave. If the adversary successfully deletes delegation in the zone file. It would not only cause service disruption to the  domains handled by delegated server, but would also disrupt a backup. 
+SPF is an email authentication method designed to detect spoofed sender addresses. %Qualifiers are critical elements of SPF.
+For example, the %\texttt{v=spf1 mx -all} qualifier allows the domain's \texttt{MX} hosts to send mail for the domain \url{example.com}, 
+\texttt{v=spf1 ip4:130.190.0.0/16} \texttt{ip6:2001:660:5301:24:5d79:9378/96 -all} qualifier %allows the %acceptable 
+authorizes the specific IPv4 and IPv6 address ranges 
+and prohibits all other hosts from sending emails for the domain \url{example.com}.
+%
+%MK: %to send mail for the domain \url{example.com} and prohibits all other hosts.
+In the simplest form of the attack, the adversary can modify the \texttt{TXT} record to \texttt{v=spf1 -all} to prohibit sending emails from any hosts. %the valid hosts or any hosts at all. 
+This attack is highly viable but the rapid detection of the poisoned \texttt{TXT} record reduces the stealthiness of the attack. %, if the victim identifies that the problem lies in misconfigured SPF record.
+%The attacker might also delete the original record and create two SPF entries
+The adversary can also delete the original \texttt{TXT} record and replace it with multiple \texttt{TXT} records corresponding to each of the SPF entries (in our example to two entries that authorize IPv4 and IPv6 address ranges). % ranges to send mail). % for \url{example.com}). 
+Some of the recipient mail servers will decline all of them as only one \texttt{TXT} record with multiple SPF entries is allowed by the specification \cite{spf}. 
+% And some will accept only one: https://stackoverflow.com/questions/19142369/create-both-ipv4-and-ipv6-spf-record
+%
+% https://serverfault.com/questions/29777/will-adding-a-second-spf-record-mess-up-my-dns
+%
+%
+%This may increase the stealthiness as the admin would see correct entries.
+Finally, if the domain does not have a valid SPF record, %the result is a permanent error. %Some mail receivers
+message is rejected during the SMTP transaction and returns a permanent error \cite{spf}.
+% https://community.spiceworks.com/topic/2140473-spf-record-syntax-error
+%
+%https://serverfault.com/questions/855639/spf-record-fails-how-to-verify-server-ip-address-and-managing-multiple-spf-rec
+%Finally, note that an improper format of the SPF entry results in 
+%If the domain does not have a valid SPF record, the result is a permanent error
+%
+%rejecting victim's email by the recipient server to reject victim's email.
+Therefore, the attacker can modify %by deleting and adding 
+the relevant \texttt{TXT} record with a syntax error, or a typo. 
+For example, the required hyphen in the ``\texttt{-all}'' type could be replaced by the en-dash. %, which would increase the stealthiness of the attack in comparison to the previous methods. 
+This method increases significantly the stealthiness of the attack in comparison to the previous methods. 
+%https://community.spiceworks.com/topic/2140473-spf-record-syntax-error
+
+\textbf{Deletion or modification of a \texttt{PTR} record:} 
+A PTR record translates an IP address to the host name.
+Although it can be used by different services, one of the most commonly used applications is...
+
+%The adversary can remove the pointer record (PTR)...
 
 
 \subsubsection{Man-in-the-middle (MITM) Attacks}

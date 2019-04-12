@@ -132,7 +132,7 @@ If the record set includes more than one SPF entry the evaluation produces the  
 %
 %This may increase the stealthiness as the admin would see correct entries.
 Similarly, if the domain does not have a valid SPF record, %the result is a permanent error. %Some mail receivers
-the evaluation returns the permanent error and the mail may be rejected during the SMTP transaction \cite{spf}.
+the evaluation also returns the permanent error and the mail may be rejected during the SMTP transaction \cite{spf}.
 % https://community.spiceworks.com/topic/2140473-spf-record-syntax-error
 %
 %https://serverfault.com/questions/855639/spf-record-fails-how-to-verify-server-ip-address-and-managing-multiple-spf-rec
@@ -145,6 +145,7 @@ the relevant \texttt{TXT} record with a syntax error, or a typo.
 For example, the required hyphen in the ``\texttt{-all}'' type could be replaced by the en-dash. %, which would increase the stealthiness of the attack in comparison to the previous methods. 
 This method increases significantly the stealthiness of the attack in comparison to the previous methods. 
 %https://community.spiceworks.com/topic/2140473-spf-record-syntax-error
+In our experiments we do not examine how the email service providers implement the RFC specification.
 
 \begin{comment}
 \textbf{Deletion or modification of a \texttt{PTR} record:} 

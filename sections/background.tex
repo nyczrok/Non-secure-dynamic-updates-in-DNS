@@ -117,7 +117,11 @@ Standard primary zone configuration supports \textit{only} ``nonsecure and secur
 Microsoft is aware of the vulnerability and informs the users willing to setup a non-secure implementation that ``allowing nonsecure dynamic updates is a significant security vulnerability because updates can be accepted from untrusted sources.''
 However, it remains unclear why the vulnerable version is still supported in the latest production version of the software--over 20 years after the initial release of the RFC specification.
 
-Open source DNS software such as BIND of PowerDNS also support non-secure dynamic updates: an administrator may configure IP ranges that are allowed to perform DNS updates, in particular  using a BIND's built-in argument ``any'', or ``0.0.0.0/0'', which means that all ranges are accepted to make DNS updates. 
+Open source DNS software such as BIND or PowerDNS also support non-secure dynamic updates. 
+Dynamic update is enabled by including the \texttt{allow-update}  % or an \texttt{update-policy} 
+clause in the zone statement in BIND and \texttt{allow-dnsupdate-from} in PowerDNS.
+An administrator may configure IP ranges that are allowed to perform DNS updates, in particular ``\texttt{0.0.0.0/0}'', or may use a built-in argument ``\texttt{any}'' in BIND to accept updates from all IP ranges.
+%, which means that all ranges are accepted to make DNS updates. 
 Both implementations support DNS update forwarding.  
 If a slave server receives a DNS dynamic update for a zone for which it is authoritative and the update forwarding is enabled then the request will be forwarded to and processed by the master server.
 
@@ -130,3 +134,15 @@ If a slave for a zone receives a DDNS update for a zone for which it is authorit
 
 
 \subsection{Dynamic Updates and DNSSEC}
+DNSSEC is a set of extensions to DNS which provide %to DNS resolvers
+authentication of origin and DNS data integrity \cite{rfc4033}.
+It provides a solution to malicious path changes between DNS resolvers and authoritative name servers if end-to-end validation is permitted on hosts. 
+The current implementations of the DNS software provide a good support for integrating DNSSEC with dynamically updated zones.
+It is critical because if the dynamically changed records and the zone are not re-signed automatically, then any user who uses a validating DNS resolver would not be able to make a successful resolution.
+BIND 9.7.0 (and later versions) support the semi-automatic smart signing feature and fully automatic zone signing functionality which improve and simplify the process of signing, operating, and maintaining DNSSEC-signed zones (in particular zones updated dynamically).
+The \texttt{auto-dnssec maintain} clause in the zone informs the name server that this is a dynamic zone, and therefore it should be automatically signed, and periodically re-signed as necessary.
+However, dynamic updates function in BIND integrated with DNSSEC require to authenticate hosts\footnote{using polices defined in the \texttt{update-policy} clause which is mutually exclusive with the \texttt{allow-update} clause which supports non-secure update requests.} and may only be used with a secret key %(TSIG or SIG(0)) 
+which is used to cryptographically sign each update.
+Similarly, DNSSEC in %Windows Server 2012 
+Windows 2008 R2 (and later versions) can also be used for dynamic zones (and automatic re-signing updated zones), but only if part of active-directory integrated zones configured with secure updates.
+Therefore, even if DNSSEC does not prevent the zone poisoning attack, the common DNSSEC implementations enforce using secure dynamic updates.

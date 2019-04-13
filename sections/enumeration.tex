@@ -1,35 +1,26 @@
 \section{Enumeration of vulnerable resources}
-\subsection{Global campaign 1}
-Input data set: 
-\begin{itemize}
- \item 3,277,097,568 domain/server pairs
- \item 327,688,010 unique domains
- \item 3,448,271 unique DNS servers
-\end{itemize}
 
-Vulnerable resources:
-\begin{itemize}
- \item 579,186(0.018\%) domain/server pairs
- \item 309,687(0.095\%) unique domains
- \item 5738(0.166\%) unique DNS servers
-\end{itemize}
+\begin{table}
+  \caption{Summary of vulnerable resources \label{tab:vulnerable}}
+ \centering
+\begin{tabular}{l*{3}{c}}
+\Xhline{2\arrayrulewidth}
+\#  & \textbf{\textit{Global 1}} & \textbf{\textit{Global 2}} \\
+\hline
+Domains & 309,687(0.095\%) & 381,965(0.108\%) \\
+NS (IP addresses) & 5738(0.166\%) & 5576(0.145\%) \\
+Domain--NS IP pairs & 579,186(0.018\%) & 679,930(0.014\%) \\
+\Xhline{2\arrayrulewidth}
+ \end{tabular}
+\end{table}
+
+
+\subsection{Global campaign 1}
+We performed our first global campaign between \hl{need the timeframe here} using domain set specified in Table \ref{tab:data}. We were able to confirm 309,687 vulnerable domains translating into 0.095\% of all the scanned domains and 5738 (0.166\%) unique, vulnerable NSs. In total, we discovered  579,186 (0.018\%) vulnerable Domain--NS pairs (Table \ref{tab:vulnerable}). The low percentage of vulnerable resource can be explained by the broad input set that were not actively verified before vulnerability scans (\ref{sec:dataset}). 
 
 \subsection{Global campaign 2}
-
-Input data set: 
-\begin{itemize}
- \item 5,032,117,394 domain/server pairs
- \item 353,870,509 unique domains
- \item 3,855,614 unique DNS servers
-\end{itemize}
-
-Vulnerable resources:
-\begin{itemize}
- \item 679,930(0.014\%) domain/server pairs
- \item 381,965(0.108\%) unique domains
- \item 5576*0.145\%) unique DNS servers
-\end{itemize}
-
+Our second global campaign (\hl{need the timeframe here}) confirmed the results obtained during the first trail. We discovered 381,965(0.108\%) vulnerable domains, 5576(0.145\%) vulnerable NSs and 679,930(0.014\%) unique Domain--NS pairs. In comparison to the first global campaign, the number of vulnerable domains was increased by more than 23\%, while the number of vulnerable servers decrease by 3\% regardles the increased input set size. 
+\michal{Do we need to explain those results further?}
 
 
 \subsection{Short-lived domains}

@@ -1,20 +1,20 @@
 \section{Descriptive statistics of vulnerable resources}
 \subsection{Country overview}
-\autoref{fig:map} presents geographic distribution of vulnerable resources. In highlighted countries, we detected at least one vulnerable server while the size of each circle is proportional to their number. We discovered vulnerable servers in 125 countries across the globe including all the countries in Europe, North America and a vast majority of countries in Asia, South America, Australia and Oceania. Relatively low number of vulnerable servers in the African region can be explained by low number of total DNS servers in the area \footnote{\url{https://labs.ripe.net/Members/emileaben/dns-root-server-transparency}}. \michal{We can probably get a better reference here}
+\autoref{fig:heatmap} presents geographic distribution of vulnerable resources. In highlighted countries, we detected at least one vulnerable server while the size of each circle is proportional to their number. We discovered vulnerable servers in 125 countries across the globe including all the countries in Europe, North America and a vast majority of countries in Asia, South America, Australia and Oceania. Relatively low number of vulnerable servers in the African region can be explained by low number of total DNS servers in the area \footnote{\url{https://labs.ripe.net/Members/emileaben/dns-root-server-transparency}}. \michal{We can probably get a better reference here}
 
 The vast majority of vulnerable servers are located in Japan (716151), US (6442), South Korea (2922), Turkey (2701), Brazil (2080), Germany (1209), Taiwan (1135) and Canada (1047). 
 
-\begin{figure}[!hbt]
-\centering
-\includegraphics[width=1\columnwidth]{map.png}
-\caption{Countries}
-\label{fig:map}
-\end{figure}
+% \begin{figure}[!hbt]
+% \centering
+% \includegraphics[width=1\columnwidth]{map.png}
+% \caption{Countries}
+% \label{fig:map}
+% \end{figure}
 
 \begin{figure}[!hbt]
 \centering
 \includegraphics[width=1\columnwidth]{heatmap.png}
-\caption{Heatmap - Japan aligned with the US}
+\caption{Map of vulnerable countries.}
 \label{fig:heatmap}
 \end{figure}
 
@@ -23,31 +23,54 @@ We continue by investigating distribution of vulnerable resources across differe
 
 Those results are confirmed by per-AS analysis (\autoref{fig:ip_as_pie}). AS 33363 contains two main vulnerable authoritative servers and constitutes 83.9\% of vulnerable domains. 5 ASes containing the largest amount of vulnerable domains are responsible for 95.7\% of the total number of vulnerable resources. 
 
-\begin{figure}[!hbt]
-\centering
-\includegraphics[width=.8\columnwidth]{ip_pie_anonymous.png}
-\caption{IP addresses}
-\label{fig:ip_pie}
-\end{figure}
+\begin{figure*}[!ht]
+\begin{minipage}[t]{.33\textwidth}
+    \includegraphics[width=1\columnwidth]{ip_pie_anonymous.png}
+    \caption{Vulnerable IP addresses.}
+    \label{fig:ip_pie}
+\end{minipage}%
+\begin{minipage}[t]{.33\textwidth}
+    \centering
+    \includegraphics[width=1\columnwidth]{ip_as_pie_anonymous.png}
+    \caption{Vulnerable Autonomous \\Systems.}
+    \label{fig:ip_as_pie}
+\end{minipage}%
+\begin{minipage}[t]{.33\textwidth}
+    \centering
+    \includegraphics[width=1\columnwidth]{tld_pie.png}
+    \caption{Vulnerable Top-Level Domains.}
+    \label{fig:tld_pie}
+\end{minipage}%
 
-\begin{figure}[!hbt]
-\centering
-\includegraphics[width=.8\columnwidth]{ip_as_pie_anonymous.png}
-\caption{AS}
-\label{fig:ip_as_pie}
-\end{figure}
+\end{figure*}
+
+
+
+% \begin{figure}[!hbt]
+% \centering
+% \includegraphics[width=.8\columnwidth]{ip_pie_anonymous.png}
+% \caption{IP addresses}
+% \label{fig:ip_pie}
+% \end{figure}
+% 
+% \begin{figure}[!hbt]
+% \centering
+% \includegraphics[width=.8\columnwidth]{ip_as_pie_anonymous.png}
+% \caption{AS}
+% \label{fig:ip_as_pie}
+% \end{figure}
 
 \subsection{Per-CERT statistics}
 \subsection{Per-TLD statistics}
 
 We analyse the Top Level Domains (TLD) of vulnerable domains (\autoref{fig:tld_pie}). The vast majority (69.6\%) belongs to the 3 most popular TLDs (.com, .net and .biz). We then compare the results against market share of each respective TLD (\autoref{fig:tld_market}). Interestingly, we observe the number of vulnerable .net and .biz domains significantly exceeding their overall market share. 
 
-\begin{figure}[!hbt]
-\centering
-\includegraphics[width=.8\columnwidth]{tld_pie.png}
-\caption{TLD}
-\label{fig:tld_pie}
-\end{figure}
+% \begin{figure}[!hbt]
+% \centering
+% \includegraphics[width=.8\columnwidth]{tld_pie.png}
+% \caption{TLD}
+% \label{fig:tld_pie}
+% \end{figure}
 
 \begin{figure}[!hbt]
 \centering

@@ -21,13 +21,14 @@ However, with the introduction of the Dynamic Host Configuration Protocol (DHCP)
 %
 \textit{Dynamic updates in DNS} is a protocol extension that addresses the problem of fast changes of DNS resource records (RRs) in zone files, such as an \texttt{A} record, which provides a mapping between a domain name and an IP address.
 
-The dynamic updates have been described in RFC 2136 \cite{rfc2136} in 1997. 
+The dynamic updates have been described in RFC 2136 (proposed standard) \cite{rfc2136} in 1997. 
 %%MK: The specification supports all DNS record types.
 %%MK: Therefore, 
-A client can update, add or delete almost any type of record, including \texttt{A}, \texttt{AAAA}, \texttt{NS}, or \texttt{TXT}.
+A client can update, add or delete~%almost 
+any~type~of record, including \texttt{A}, \texttt{AAAA}, \texttt{NS}, or \texttt{TXT}.
 It is often used %as an extension of
 in combination with the DHCP protocol, which can be configured %not only 
-as a mechanism for allocation of network addresses to Internet hosts but also to dynamically update both \texttt{A} and \texttt{PTR} (pointer or reverse DNS) resource records in the DNS server %on a client's behalf 
+as a mechanism for allocation of network addresses to Internet hosts but also to dynamically update both \texttt{A} and \texttt{PTR} (pointer or reverse  DNS) resource records in the DNS server %on a client's behalf 
 on behalf of its clients (cf.~\autoref{fig_dhcp}).
 
 \begin{figure}[!ht]
@@ -93,11 +94,20 @@ briefly discusses the security considerations and recommends using DNS Security 
 clients to those authorized to perform them %, for example, a local DHCP server 
 (cf. RFC~2137~\cite{rfc2137} %, superseded by RFC~3007~\cite{rfc3007}).
 and RFC~3007~\cite{rfc3007}).
+
 If the public key security mechanism is not implemented, an authoritative name server is expected to accept the dynamic updates only from a statically preconfigured set of IP addresses.
 The address match lists should be as restrictive as possible and limited to, for example, an IP address of a DHCP server.
-An alternative security mechanism based on shared secret key (TSIG: Secret Key Transaction Authentication for DNS) and message authentication code was introduced three years later in RFC 2845 \cite{rfc2845} and became the most commonly used method in popular DNS software implementations.
+%MK: introduced:
+Note that the mechanism based on match lists is insecure because the adversary may %easily 
+guess the IP addresses, which are authorised to make updates, and send requests with spoofed sources IP addresses.
+The mechanism could have been effective if dynamic updates were using the TCP protocol for transport. However, Paul Vixie--the editor of RFC 2136--explained to us that the working group was considering proposing TCP rather than UDP but that would involve opening the port TCP 53 in firewalls, which seemed to be problematic at that time.
+The RFC 2136 working group was aware of the security limitations as described in Section 8 of the specification \cite{rfc2136}. 
+However, according to dr. Vixie they decided to release the document as a \textit{proposed standard} instead of an \textit{Internet standard} at least until the security issues raised in the specification are not addressed. 
+
+%An alternative
+A lightweight security mechanism based on shared secret key (TSIG: Secret Key Transaction Authentication for DNS) and message authentication code was introduced three years later in RFC 2845 \cite{rfc2845} and became the most commonly used method in popular DNS software implementations.
 %
-%
+
 The pressing need for DNS dynamic updates and the delayed introduction of the robust and lightweight security measures may explain a rapid uptake of the vulnerable by design, non-secure dynamic updates.
 %why the vulnerable, non-secure implementations have
 
@@ -111,19 +121,20 @@ Some are vulnerable by default.
 
 Microsoft Server supports two configurations of a DNS server: an active directory--integrated or a standard primary zone.
 To date, both versions support vulnerable to %MK: zone poisoning 
-non-secure dynamic updates configurations.
-The former allows either ``secure only" updates using extended TSIG or ``nonsecure and secure'' updates. %MK: , whereas the latter 
+non-secure dynamic updates configurations, including the latest Windows Server 2019 \cite{step}.
+The former allows either ``secure only" updates using extended TSIG or ``nonsecure and secure'' updates--a zone type that accepts updates from any client. %MK: , whereas the latter 
 Standard primary zone configuration supports \textit{only} ``nonsecure and secure''  updates.
 Microsoft is aware of the vulnerability and informs the users willing to setup a non-secure implementation that ``allowing nonsecure dynamic updates is a significant security vulnerability because updates can be accepted from untrusted sources.''
 However, it remains unclear why the vulnerable version is still supported in the latest production version of the software--over 20 years after the initial release of the RFC specification.
 
-Open source DNS software such as BIND or PowerDNS also support non-secure dynamic updates. 
-Dynamic update is enabled by including the \texttt{allow-update}  % or an \texttt{update-policy} 
-clause in the zone statement in BIND and \texttt{allow-dnsupdate-from} in PowerDNS.
-An administrator may configure IP ranges that are allowed to perform DNS updates, in particular ``\texttt{0.0.0.0/0}'', or may use a built-in argument ``\texttt{any}'' in BIND to accept updates from all IP ranges.
+Open source DNS software such as BIND or PowerDNS (including their latest versions) also support non-secure dynamic updates. 
+Dynamic update is enabled by including an \texttt{allow-update} or an \texttt{update-policy} 
+clauses in the zone statement in BIND \cite{bindman} and \texttt{allow-dnsupdate-from} in PowerDNS \cite{powerman}.
+An administrator may configure IP ranges that are allowed to perform DNS updates\footnote{the method does not guarantee secure updates as discussed in the previous section.}, in particular ``\texttt{0.0.0.0/0}'', or may use a built-in argument ``\texttt{any}'' in BIND's \texttt{allow-update} clause  to accept updates from all IP ranges.
 %, which means that all ranges are accepted to make DNS updates. 
-Both implementations support DNS update forwarding.  
+Both implementations support DNS update forwarding, which may also be exploited by the adversary.
 If a slave server receives a DNS dynamic update for a zone for which it is authoritative and the update forwarding is enabled then the request will be forwarded to and processed by the master server.
+If the \texttt{allow-update} clause of the master includes the IP address of a slave server which performs forwarding, the master will accept it \cite{bindman}.
 
 
 \begin{comment}
@@ -136,13 +147,15 @@ If a slave for a zone receives a DDNS update for a zone for which it is authorit
 \subsection{Dynamic Updates and DNSSEC}
 DNSSEC is a set of extensions to DNS which provide %to DNS resolvers
 authentication of origin and DNS data integrity \cite{rfc4033}.
-It provides a solution to malicious path changes between DNS resolvers and authoritative name servers if end-to-end validation is permitted on hosts. 
+It provides a solution to malicious path changes between DNS resolvers and authoritative name servers if end-to-end validation is permitted on hosts.
+However, DNSSEC was \textit{not} designed to prevent unauthorised changes in authoritative  servers, in particular using the zone poisoning attack.
+
 The current implementations of the DNS software provide a good support for integrating DNSSEC with dynamically updated zones.
 It is critical because if the dynamically changed records and the zone are not re-signed automatically, then any user who uses a validating DNS resolver would not be able to make a successful resolution.
-BIND 9.7.0 (and later versions) support the semi-automatic smart signing feature and fully automatic zone signing functionality which improve and simplify the process of signing, operating, and maintaining DNSSEC-signed zones (in particular zones updated dynamically).
+BIND 9.7.0 (and later versions) support the semi-automatic smart signing feature and fully automatic zone signing functionality which improve and simplify the process of signing, operating, and maintaining DNSSEC-signed zones (in particular zones updated dynamically) \cite{bindman}.
 The \texttt{auto-dnssec maintain} clause in the zone informs the name server that this is a dynamic zone, and therefore it should be automatically signed, and periodically re-signed as necessary.
-However, dynamic updates function in BIND integrated with DNSSEC require to authenticate hosts\footnote{using polices defined in the \texttt{update-policy} clause which is mutually exclusive with the \texttt{allow-update} clause which supports non-secure update requests.} and may only be used with a secret key %(TSIG or SIG(0)) 
+However, dynamic updates function in BIND integrated with DNSSEC require to authenticate hosts\footnote{using polices defined in the secure \texttt{update-policy} clause which is mutually exclusive with the \texttt{allow-update} clause which supports non-secure update requests.} and may only be used with a secret key %(TSIG or SIG(0)) 
 which is used to cryptographically sign each update.
 Similarly, DNSSEC in %Windows Server 2012 
-Windows 2008 R2 (and later versions) can also be used for dynamic zones (and automatic re-signing updated zones), but only if part of active-directory integrated zones configured with secure updates.
+Windows 2008 R2 \cite{micro} (and later versions) can also be used for dynamic zones (and fully automatic re-signing updated zones starting from Windows Server 2012 \cite{micro2}), but only if part of active-directory integrated zones configured with secure updates.
 Therefore, even if DNSSEC does not prevent the zone poisoning attack, the common DNSSEC implementations enforce using secure DNS dynamic updates.

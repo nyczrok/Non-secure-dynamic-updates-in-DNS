@@ -6,7 +6,7 @@ In this section, we present the taxonomy of attacks by an adversary on a vulnera
 We refer to the attacks exploiting non-secure DNS dynamic updates as to \textit{zone poisoning}.
 %
 We first explain our setup to perform lab experiments, followed by 
-presenting the attack vectors tested lab environment. 
+presenting the attack vectors tested in the lab environment. 
 %the methodology which we used to %compromise domain validation to obtain a valid digital certificate for a vulnerable domain.
 %confirm different attack vectors.
 %Finally, w
@@ -22,7 +22,7 @@ composed of two servers.
 %MK: A DNS server that is vulnerable to receive  dynamic zone updates (victim) without authentication from any authoritative server. The second server will act as an adversary to update the zone files of our victim.  We explain these configurations in detail below. 
 
 
-\textbf{Adversary configuration:} Depending on the type of attack, different configurations might be required. 
+\textbf{Adversary configuration:} Depending on the type of the attack, different configurations might be required. 
 In our setup, we assume that our adversary has already scanned for vulnerable 
 resources and knows the domain name and its authoritative name server.
 %MK: servers and knows the public IP address of the victim. 
@@ -36,12 +36,12 @@ For more advanced attacks the adversary might need to set up a mail, a web or a 
 \textbf{Victim configuration:} Our victim server is running BIND 9.10.3 DNS and Apache HTTP software. 
 %MK: For the adversary to modify DNS records, t
 The victim name server (\url{ns1.example.com}) is configured to allow non-secure dynamic updates %of records as explained in the previous section. 
-from anyone using the built-in argument ``any'' in the zone configuration of our domain (\url{example.com}). %, as explained in the previous section.
+from anyone using the \texttt{allow-update} clause with the built-in argument ``any'' in the zone configuration of our domain (\url{example.com}). %, as explained in the previous section.
 %
 %We assume that o
 Our victim is hosting a website, 
 which is protected with an SSL certificate. 
-The victim server might also have a mail server configured with the corresponding \texttt{MX} record defined in the zone file.  
+The victim server might also have a mail server configured with the corresponding \texttt{MX} record defined in the zone~file.  
 
 
 \subsection{Taxonomy of Attacks}
@@ -122,7 +122,7 @@ In the simplest form of the attack, the adversary can modify the \texttt{TXT} re
 This attack is highly viable but the rapid detection of the poisoned \texttt{TXT} record reduces the stealthiness of the attack. %, if the victim identifies that the problem lies in misconfigured SPF record.
 %The attacker might also delete the original record and create two SPF entries
 The adversary can also delete the original \texttt{TXT} record or replace it with multiple \texttt{TXT} records corresponding to each of the SPF entries (in our example to two entries that authorize IPv4 and IPv6 address ranges). % ranges to send mail). % for \url{example.com}). 
-If the record set includes more than one SPF entry the evaluation produces the  permanent error and the rejection of the mail is an option according to RFC 7208 \cite{spf}.
+If the record set includes more than one SPF entry the evaluation produces the  permanent error and the rejection of the mail is an option according to RFC 7208 \cite{spf}\footnote{In our experiments we do not examine how the email service providers implement the RFC specification.}.
 %
 %MK: Some of the recipient mail servers may decline all of them as only one \texttt{TXT} record with multiple SPF entries is allowed by the specification \cite{spf}. 
 % And some will accept only one: https://stackoverflow.com/questions/19142369/create-both-ipv4-and-ipv6-spf-record
@@ -145,7 +145,7 @@ the relevant \texttt{TXT} record with a syntax error, or a typo.
 For example, the required hyphen in the ``\texttt{-all}'' type could be replaced by the en-dash. %, which would increase the stealthiness of the attack in comparison to the previous methods. 
 This method increases significantly the stealthiness of the attack in comparison to the previous methods. 
 %https://community.spiceworks.com/topic/2140473-spf-record-syntax-error
-In our experiments we do not examine how the email service providers implement the RFC specification.
+
 
 \begin{comment}
 \textbf{Deletion or modification of a \texttt{PTR} record:} 
@@ -159,14 +159,34 @@ The tricky part is that the PTR record is not configured by the DNS service prov
 
 
 
-\subsubsection{Man-in-the-middle (MITM) Attacks}
-The second type of attack that adversary can utilize is MITM attack. These attacks can be more sophisticated and harder to detect. 
+\subsubsection{Man-in-the-Middle (MITM) Attacks}
+The second type of the attack that adversary can use is the Man-in-the-Middle. 
+These attacks are more sophisticated but also harder to detect. 
 
-\textbf{Update of A records:}
-Adversary can update the A records in the zone file of the victim and change IP address to its compromised machine. In this way the traffic directed towards the victim will be redirected towards the adversary. If the adversary acts as a proxy server it can gain useful information about the victims. For instance, the number of customers, geo-location based on IP addresses and pages that were visited by the customers. However, for a more sophisticated attack the adversary can setup a phishing website to steal all the personal information from the customers of the victim. He can then forward the collected information back to the customer for an increase stealthiness. 
+\textbf{Update of an \texttt{A/AAAA} record of a domain or a subdomain:}
+An adversary can update\footnote{by deleting the original resource record and adding the new one.} an \texttt{A/AAAA} record of %\url{example.com} (and its subdomains) 
+a domain or a subdomain in the zone file of the victim and change the existing IP address to the IP address of the machine under her control. %its compromised machine. 
+%In this way the traffic directed towards the  domain of the victim will be redirected towards the adversary. % and will results in the domain hijacking.
+In this way all the traffic will be redirected towards the adversary.
+If the adversary acts as a simple proxy server between the victim and its clients and only passively observes the traffic then she can gain limited but useful information about, %the clients, 
+%victims. For instance, 
+%%such as 
+for example, the number of customers, geo-location based on IP addresses, or pages that were visited by the customers (in case of the web traffic). 
+%However, for
+%Depending on the service run by the victim on the vulnerable domain (web, ssh, ftp) the adversary needs to setup a corresponding server to intercept the communication and 
+In a more sophisticated attack the adversary can setup a service, in particular a phishing website to steal %all the  personal 
+critical information from the customers of the victim, such as logins and passwords, or credit card numbers. 
+She should then forward the collected information back to the %customer 
+victim to increase the stealthiness of the attack. 
 
-\textbf{Update of MX records:} 
-If the victim runs a mail server, adversary can also change the MX record with its own IP. The adversary in this case can store the emails of the victims and forward the emails back to the victim. If the adversary wants to run a phishing website it can also update the MX record and bypass email challenge to validate the domain. 
+\textbf{Update of an \texttt{MX} record:} 
+If the victim runs a mail server, the adversary can also change the \texttt{MX} RR (e.g. \texttt{MX  10 mail.example.com}) and replace \url{mail.example.com} with the name of the mail server maintained by her (e.g. \url{mail.malicious.com}).
+The adversary may also need to set up an additional name server which will provide the DNS resolution of \url{mail.malicious.com}.
+If the name \url{mail.example.com} %is part of the same zone, 
+is managed by the same vulnerable to zone poisoning parent name server, the adversary may only update an \texttt{A/AAAA} record of an original \url{mail.example.com} with its own IP address, as explained earlier.
+In both cases, the adversary can store the emails of the clients and forward them back %the emails back 
+to the victim mail server.
+%MK: we'll explain later: If the adversary wants to run a phishing website it can also update the \texttt{MX} record and bypass email challenge to validate the domain (see Section \ref{sec:domainvalidation} for more details). 
 
 %and map its own IP address for the domain. In this case the traffic for his server will be redirected towards to the adversaries server. However, the victim or its customers would be able to detect the outage. If the adversary run a phishing website similar to the victim, he might be able to successfully steal customer information. Similarly, adversary will also be able to build a completely new sub-domain of our victim legitimate domain. He can then use the sub-domain to collect 
 

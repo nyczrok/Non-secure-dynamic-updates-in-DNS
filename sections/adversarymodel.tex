@@ -61,7 +61,7 @@ It can be used to capture the traffic between the victim's server and its client
 
 \item \textbf{Domain shadowing attack:} %Finally, t
 The adversary %might also be able to 
-can also spawn malicious subdomains which she can then use for exploit kits, malware, phishing and stealing information from the victim. 
+can also spawn malicious subdomains which she can then use for exploit kits, malware, phishing and stealing information from other victims. 
 Domain shadowing attacks~\cite{shadowing} are %more
 very stealthy in nature. 
 The subdomains inherit the trust of the parent domain which enables them to evade countermeasures based on domain reputation or blacklisting systems. 
@@ -171,13 +171,15 @@ In this way all the traffic will be redirected towards the adversary.
 If the adversary acts as a simple proxy server between the victim and its clients and only passively observes the traffic then she can gain limited but useful information about, %the clients, 
 %victims. For instance, 
 %%such as 
-for example, the number of customers, geo-location based on IP addresses, or pages that were visited by the customers (in case of the web traffic). 
+for example, the number of clients, %customers, geo-location based on 
+their IP addresses, or pages that were visited by the clients %customers 
+(in case of web traffic). 
 %However, for
 %Depending on the service run by the victim on the vulnerable domain (web, ssh, ftp) the adversary needs to setup a corresponding server to intercept the communication and 
 In a more sophisticated attack the adversary can setup a service, in particular a phishing website to steal %all the  personal 
-critical information from the customers of the victim, such as logins and passwords, or credit card numbers. 
+critical information from the customers of the victim, such as logins and passwords. %, or credit card numbers. 
 She should then forward the collected information back to the %customer 
-victim to increase the stealthiness of the attack. 
+victim to increase the stealthiness of the~attack. 
 
 \textbf{Update of an \texttt{MX} record:} 
 If the victim runs a mail server, the adversary can also change the \texttt{MX} RR (e.g. \texttt{MX  10 mail.example.com}) and replace \url{mail.example.com} with the name of the mail server maintained by her (e.g. \url{mail.malicious.com}).
@@ -209,17 +211,37 @@ to the victim mail server.
 
 \subsubsection{Domain Shadowing Attack}
 
-Finally, the adversary can spawn the subdomains for phishing and exploit kit attacks by adding A and AAAA records to the zone files. Furthermore, the attacker can add MX record which can be useful in redirecting abuse emails to the attacker and increase the stealthiness of the attack. 
+The adversary can spawn the subdomains for phishing and exploit kit attacks by adding new \texttt{A} and \texttt{AAAA} records to the vulnerable zone files or by adding a DNS delegation that provides a mapping between a new subdomain and a new child name server maintained by the adversary. % and its glue record.
 
-\textbf{Add A record:} 
-Adversary can add an A records for subdoamins with IP address pointing to the server under its control in the victims zone file. He can spawn unlimited number of subdomains and rotate between them to evade detection. Adversary can use the business model of the parent domain and can setup subdomains for phishing attack. The victim would not be able to detect attack unless it is notified. Furthermore, the attacker can use the reputation of the victim's domain to by-pass blacklisting services for the exploit kit attack. It can also lead to adversely impact the reputation of the victim's domain and business after the attack is discovered by various blacklisting services.
+\textbf{Addition of an \texttt{A/AAAA} record:} 
+The adversary can add an \texttt{A/AAAA} record for a subdomain with an IP address pointing to, for example, the web server hosting a malware delivery or a phishing website (e.g.: \texttt{bankofamerica.example.com A 123.123.123.123} or \texttt{paypal.login.account.example.com A 123.123.123.123}). 
+%under its control (\texttt{paypal.example.com A 123.123.123.123} or \texttt{bankofamerica.client.example.com A 123.123.123.123}) hosting a phishing website. %in the victims zone file. 
+She can %spawn 
+add unlimited number of subdomains and rotate between them to evade detection. 
+%The adversary could use the business model of the parent domain and can set up subdomains for phishing attack.
+%Furthermore, the attacker 
+The adversary uses the reputation of the victim's domain to by-pass domain blacklisting services. %for the exploit kit attack. 
+It can lead to adversely impact on the reputation of the victim's domain and business after the attack is discovered by %various
+blacklisting services.
+To increase the stealthiness of the attack and to prevent other classical detection methods like IP or websites blocking the adversary may use the fast-flux technique and quickly convert multiple subdomains to a wide range of IP addresses.
+The victim would not be able to detect the attack unless it regularly checks the content of the zone file or is notified. 
+However, the adversary can also update the \texttt{MX} record, as explained in the previous section, which can be useful in redirecting abuse emails to the attacker and therefore in further increasing the stealthiness of the~attack. 
+The introduction of the General Data Protection Regulation (GDPR) makes the notification of the victim more challenging because the Registrant and Administrative Contact in the WHOIS, maintained independently from vulnerable name servers, is not publicly displayed anymore.
 
-\textbf{Add Domain Delegation:}
-In order to spawn multiple subdomains and rotations between them the adversary needs to constantly update the zone file of victim. It might alert the victim because to constant changes in the file. In order to improve the stealthiness of this attack adversary can add delegated domain. It can then spawn multiple subdomains on his server without any updates to victim zone file. For example if the adversary add a delegated domain
-\textit{accounts.example.com} with the command %check this 
-\textit{nsupdate NS 10.10.10.10 accounts.example.com}. He can then spawn cs.accounts.example.com or any other sibling domains in the zone file of 10.10.10.10 server without any interaction with the victim server. 
+\textbf{Addition of an \texttt{NS} record:} %subdomain delegation:}
+To spawn multiple subdomains and perform rotation between them the adversary needs to constantly update the zone file of the victim.
+It might alert the victim because of multiple changes in the zone file of a vulnerable name server. 
+To further improve the stealthiness of the domain shadowing  attack the adversary can add a delegation: the \url{example.com} zone to the \url{account.example.com} zone maintained by the child name server (\url{ns1.account.example.com}) and a corresponding glue record, providing a mapping between its name and the IP address of the malicious server.
+Using this technique the adversary can spawn multiple subdomains on her server without performing any new updates to victim zone file.
+For example, if the adversary adds a delegation for a domain
+\url{account.example.com} % with the command %check this  \textit{nsupdate NS 10.10.10.10 accounts.example.com}. 
+then she can %spawn 
+add \url{paypal.account.example.com} or any other sibling domains in the zone file of %10.10.10.10 
+the malicious server without any interaction with the victim parent name server. 
 
-
+To provide an additional layer of redundancy and survivability of the phishing or malware infrastructure, the adversary may combine domain shadowing with double fast-flux.
+The adversary may constantly change the name and IP addresses of the malicious child name server at the victim's parent zone file using zone poisoning as well as change the mapping between malware or phishing subdomains and their IP addresses in the malicious child name server. % controlled by the adversary.
+The technique significantly increases the stealthiness of the attack without adding too much operational complexity to the adversary. 
 
 
 \subsubsection{Compromising Domain Control Validation\label{sec:domainvalidation}}

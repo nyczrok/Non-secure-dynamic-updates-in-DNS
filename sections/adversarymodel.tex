@@ -59,7 +59,10 @@ the adversary will %comprise
 poison the victim's zone file and redirect traffic to its server and then back to the victim. % without getting detected. 
 It can be used to capture the traffic between the victim's server and its clients. %customers.  
 
-\item \textbf{Domain shadowing attack:} %Finally, t
+\item
+
+\textbf{Domain
+shadowing attack:} %Finally, t
 The adversary %might also be able to 
 can also spawn malicious subdomains which she can then use for exploit kits, malware, phishing and stealing information from other victims. 
 Domain shadowing attacks~\cite{shadowing} are %more
@@ -261,7 +264,7 @@ a) \textbf {Email validation} is one of the most well-known options to confirm d
 
 In our experimental setup we were able to by-pass domain control validation and were able to obtain certificates from two top Certificate Authorities (Let's encrypt and Comodo). %Majority of CA requires either email listed in SOA record or setup a challenge on the domain. Using our methodology the adversary can bypass both of the methods to obtain a legitimate certificate for the domain. 
 
-\textbf{ Add MX record:} 
+\textbf{ Addition of an \texttt{MX} record:} 
 Adversary can also add mx record to victims zone file. It can be useful for particular places, a ) compromise email based challenge for domain control validation. %Adversary can also edit SOA records to get the abuse emails further avoid detection.
 
 

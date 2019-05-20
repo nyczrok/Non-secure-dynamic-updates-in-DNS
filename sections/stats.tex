@@ -18,6 +18,43 @@ The vast majority of vulnerable servers are located in Japan (716151), US (6442)
 \label{fig:heatmap}
 \end{figure}
 
+
+
+\subsection{Per-CERT statistics}
+
+For each one of the affected countries, we mapped the vulnerable resources to the IPv4 space that is under the jurisdiction of the national CERTs\footnote{Note that in certain countries there are multiple CERTs}. Figure~\ref{fig:certs} shows the number of vulnerable resources --both DNS servers and domain names-- that each CERT is responsible for. 
+Following the country-level pattern, the Japanese CERT is the one that hogs most of the vulnerable domains with more than 2-order of magnitude difference. Aside from JP-CERT, the distribution of vulnerable resources across CERT seems to follow a log-normal distribution. Thus, while there are some CERT than only have one vulnerable domain/IPv4 address, more than 50\% of the CERT are responsible for hundreds of vulnerable resources. 
+\begin{figure}[!ht]
+\centering
+\begin{subfigure}[b]{0.45\columnwidth}
+    \includegraphics[width=\textwidth]{figs/certs_sizevsservers.pdf}
+    \caption{Vulnerable DNS servers}
+    \label{fig:size_servers_cert}
+    \end{subfigure}
+\hfill
+\begin{subfigure}[b]{.45\columnwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figs/certs_sizevsdomains.pdf}
+    \caption{Vulnerable domains}
+    \label{fig:size_domains_cert}
+\end{subfigure}
+\caption{Distribution of vulnerable resource per CERT size}
+   \label{fig:size_cert}
+\end{figure}
+
+
+
+To further investigate these log-normal distribution, we estimated the size of each CERT by counting the amount of IPv4 addresses that are under their jurisdictions. Figure~\ref{fig:size_cert} plots the amount of vulnerable servers (Fig.~\ref{fig:size_servers_cert}) and the amount of vulnerable domains (Fig.~\ref{fig:size_domains_cert)) versus the size of the CERT for each one of the identified national CERTs.
+As expected, larger CERTs accumulate higher number of vulnerable resources. However,we can also identify a few outliers. For instance, the CERT in Tunisia only had 1 vulnerable resource while having more than 6M IPv4 addresses under their responsibility. On the contrary, the CERT in Malasya with a similar number of IPv4 addresses, it had more than 200 vulnerable resources. 
+
+
+\begin{figure*}[!hbt]
+\centering
+\includegraphics[width=1\textwidth]{certs.pdf}
+\caption{Vulnerable resources per CERT}
+\label{fig:certs}
+\end{figure*}
+
 \subsection{Per-AS statistics}
 We continue by investigating distribution of vulnerable resources across different Autonomous Systems (AS). \autoref{fig:ip_pie} shows the number of vulnerable domains per authoritative server. 2 authoritative servers (119.82.8.252 and 119.82.8.251) are responsible for 80\% of vulnerable domains, while the 3rd server is responsible for 2.2\% of them. 
 
@@ -60,7 +97,8 @@ Those results are confirmed by per-AS analysis (\autoref{fig:ip_as_pie}). AS 333
 % \label{fig:ip_as_pie}
 % \end{figure}
 
-\subsection{Per-CERT statistics}
+
+
 \subsection{Per-TLD statistics}
 
 We analyse the Top Level Domains (TLD) of vulnerable domains (\autoref{fig:tld_pie}). The vast majority (69.6\%) belongs to the 3 most popular TLDs (.com, .net and .biz). We then compare the results against market share of each respective TLD (\autoref{fig:tld_market}). Interestingly, we observe the number of vulnerable .net and .biz domains significantly exceeding their overall market share. 

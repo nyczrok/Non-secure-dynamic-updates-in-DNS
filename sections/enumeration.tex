@@ -24,8 +24,34 @@ Our second global campaign (\hl{need the timeframe here}) confirmed the results 
 
 
 \subsection{Short-lived domains}
+
+
 \subsection{Vulnerable subdomains}
-\subsection{Propagation between primary and secondary name servers - Michał}
+
+\begin{table}
+  \caption{Summary of vulnerable subdomains \label{tab:subdomains}}
+ \centering
+\begin{tabular}{l*{2}{c}}
+\Xhline{2\arrayrulewidth}
+\#  & \textbf{\textit{Subdomains}}  \\
+\hline
+Subdomains & 399 / 35382217 (0.001127685\%) \\
+NS (IP addresses) & 401 / 722989 (0.055464191\%)  \\
+Subdomain--NS IP pairs & 520 / 104955041 (0.00049545\%)  \\
+\hline
+2nd level domains & 236 \\
+Subdomains with vulnerable 2nd level domain &  14 (5.93220339\%) \\
+\Xhline{2\arrayrulewidth}
+ \end{tabular}
+\end{table}
+
+\michal{We should explain here why we have ``low quality'' input set of subdomains}
+Table \ref{tab:subdomains} presents the number of detected vulnerable subdomains. We observe 3 orders of magnitude lower number of vulnerable domains than when performing 2nd level domain scans (Figure \ref{tab:vulnerable}), but a comparable number of vulnerable server. This is caused by higher domain dynamism and fast-dissapearing, disposable domains present in the input subdomain list~\cite{chen2014dns}. Furthermore, the input set did not include servers responsible for the majority of vulnerable 2nd level domains (Figure \ref{fig:ip_pie}) explaining the disproportion between the percentage of vulnerable servers and domains. 
+
+Furthermore, we extract 2nd level domains from vulnerable subdomains. Vulnerable subdomains are widely spread between second level domains resulting in ~1.69 subdomains per a 2nd level domain on average. Surprisingly, only 14 (6\%) extracted 2nd level domains were detected as vulnerable during our previous tests. While our study focuses on 2nd level domains, this suggests that multiple subdomain servers are vulnerable to our attack even when the delegating 2nd leve domain servers are properly configured. Finally, we present only servers that responded with a modified entry within a short period of times representing the lowe bound of the problem. 
+
+
+\subsection{Propagation between primary and secondary name servers}
 
 \begin{table}
   \caption{Domains vulnerability \label{tab:propagation_vulnerable}}

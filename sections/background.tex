@@ -130,7 +130,7 @@ However, it remains unclear why the vulnerable version is still supported in the
 Open source DNS software such as BIND or PowerDNS (including their latest versions) also support non-secure dynamic updates. 
 Dynamic update is enabled by including an \texttt{allow-update} or an \texttt{update-policy} 
 clauses in the zone statement in BIND \cite{bindman} and \texttt{allow-dnsupdate-from} in PowerDNS \cite{powerman}.
-An administrator may configure IP ranges that are allowed to perform DNS updates\footnote{the method does not guarantee secure updates as discussed in the previous section.}, in particular ``\texttt{0.0.0.0/0}'', or may use a built-in argument ``\texttt{any}'' in BIND's \texttt{allow-update} clause  to accept updates from all IP ranges.
+An administrator may configure IP ranges that are allowed to perform DNS updates\footnote{The method does not guarantee secure updates as discussed in the previous section.}, in particular ``\texttt{0.0.0.0/0}'', or may use a built-in argument ``\texttt{any}'' in BIND's \texttt{allow-update} clause  to accept updates from all IP ranges.
 %, which means that all ranges are accepted to make DNS updates. 
 Both implementations support DNS update forwarding, which may also be exploited by the adversary.
 If a slave server receives a DNS dynamic update for a zone for which it is authoritative and the update forwarding is enabled then the request will be forwarded to and processed by the master server.

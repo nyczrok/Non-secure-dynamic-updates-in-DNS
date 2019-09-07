@@ -33,36 +33,39 @@ For more advanced attacks the adversary might need to set up a mail, a web or a 
 
 %\hl{has access to the compromised machine} \michal{It's a bit confusing to me. Does it mean, that the adversary has like ssh access? Or just that there's connectivity between both hosts? Also the Victim is not yet compromised during the setup, right?} with a public IP address. The adversary will also require Dynamic DNS update utility \texttt{nsupdate} to modify the zone of our victim. Furthermore, for more sophisticated attacks other services like email server and webserver are required. %An email server with forwarding is also required for more sophisticated attacks explained later. EDIT
 
-\textbf{Victim configuration:} Our victim server is running BIND 9.10.3 DNS and Apache HTTP software. 
+\textbf{Victim configuration:} Our victim server is running DNS BIND 9.10.3 and Apache HTTP software. 
 %MK: For the adversary to modify DNS records, t
 The victim name server (\url{ns1.example.com}) is configured to allow non-secure dynamic updates %of records as explained in the previous section. 
 from anyone using the \texttt{allow-update} clause with the built-in argument ``any'' in the zone configuration of our domain (\url{example.com}). %, as explained in the previous section.
 %
 %We assume that o
 Our victim is hosting a website, 
-which is protected with an SSL certificate. 
-The victim server might also have a mail server configured with the corresponding \texttt{MX} record defined in the zone~file.  
+which is protected with an SSL/TLS certificate\footnote{We obtained two certificates issued by Let's Encrypt CA and Comodo CA InstantSSL.}. 
+The victim server %might also have 
+has a mail server configured (\url{mail.example.com}) with the corresponding \texttt{MX} record defined in the zone~file of the vulnerable name server.  
 
 
 \subsection{Taxonomy of Attacks}
-We define the attacks by the adversary in the following three categories and present the tradeoff between viability and stealthiness of each attack:
+We define the attacks by the adversary in the following five categories and present the tradeoff between viability and stealthiness of each attack:
 
 %We present the details of the following three types of attacks by the adversary and discuss the viability and stealthiness of these attacks. We also analyze the implications of these attacks on our victim
 
 \begin{itemize}
-\item \textbf{Denial of Service (DoS) attack:} In the DoS attack the adversary will be able to disrupt a service (e.g.: web, mail, domain, ssh, etc.) of the victim temporarily. 
-It is much easier to execute with limited stealthiness, as the victim would notice the unresponsive domain and would be able to fix the configuration quickly. 
 
+\item \textbf{Denial of Service (DoS) Attack:} In the DoS attack the adversary will be able to disrupt a service (e.g.: web, mail, domain, ssh, etc.) of the victim temporarily. 
+It is easy to execute with limited stealthiness, as the victim would notice the unresponsive domain and would be able to fix the configuration quickly. 
 
-\item \textbf{Man-in-the-Middle (MITM) attack:} The MITM attack requires more sophistication from the adversary while being more stealthy and difficult to detect. In this type of the attack, %our 
+\item \textbf{Domain Hijacking Attack:} The adversary may want to hijack the vulnerable domain name. 
+The attack will not only result in the denial of service but also in redirecting all the clients worldwide (e.g. website visitors) to the adversary's server (e.g. web server).
+Similarly to a simple DoS attack, the domain hijacking is easy to execute but also easy to detect by the owner of the domain.
+
+\item \textbf{Man-in-the-Middle (MITM) Attack:} The MITM attack requires more sophistication from the adversary while being more stealthy and difficult to detect. In this type of the attack, %our 
 the adversary will %comprise 
 poison the victim's zone file and redirect traffic to its server and then back to the victim. % without getting detected. 
 It can be used to capture the traffic between the victim's server and its clients. %customers.  
 
-\item
-
-\textbf{Domain
-shadowing attack:} %Finally, t
+\item \textbf{Domain
+Shadowing Attack:} %Finally, t
 The adversary %might also be able to 
 can also spawn malicious subdomains which she can then use for exploit kits, malware, phishing and stealing information from other victims. 
 Domain shadowing attacks~\cite{shadowing} are %more
@@ -71,7 +74,9 @@ The subdomains inherit the trust of the parent domain which enables them to evad
 The adversary can %spawn 
 add multiple subdomains at no cost and can rotate between them to evade detection. 
 
-The domain shadowing attack can be further sophisticated by by-passing domain control validation in order to setup a valid SSL certificate for a malicious subdomain.
+\item \textbf{Compromising Domain Control Validation (DCV):}
+The domain hijacking, MITM, domain shadowing, and other attacks can be further sophisticated by by-passing domain control validation in order to setup a valid SSL/TLS certificate for the vulnerable domain or a subdomain.
+The attack is very stealthy as it requires only temporary changes in the zone file for the period of time when the certificate is issued.
 %MK: In Section~\ref{sec:domainvalidation} we explain the details of this attack vector.
 
 %Furthermore in Section~\ref{sec:domainvalidation} we explain how attackers can by-pass domain control validation in order to setup SSL certificates. 
@@ -90,9 +95,13 @@ cause limited disruption in the service until the victim gets notified and fixes
 %%MK: with \texttt{nusupdate} utility command ``\texttt{update delete example.com A}''. 
 Note that adversary can also delete a subdomain, assuming that subdomains are managed by the same parent name server (\url{ns1.example.com}). 
 %corresponding to the web, ftp, or mail service. 
-If the victim is running different services like accounts, mail, ftp, or checkout on a separate subdomain, it will %partially 
+If the victim is running different services like accounts, mail, ftp, or checkout on a separate subdomain, 
+the adversary may want to disable a selected service which might take more time to detect.
+\begin{comment}
+it will %partially 
 disable a part of the website and might take more time to~detect. 
 %with \texttt{nusupdate} utility command \texttt{update delete example.com A} using nsupdate. 
+\end{comment}
 
  \textbf{Deletion of a zone delegation:} 
 %
@@ -161,7 +170,45 @@ The tricky part is that the PTR record is not configured by the DNS service prov
 \end{comment}
 
 
+\subsubsection{Domain Hijacking Attack}
+The second type of the attack that adversary can launch is domain hijacking. 
+Similarly to the DoS attack it can be financially devastating to the original domain name holder.
+The adversary needs to replace the original DNS record in order to redirect legitimate clients to her server by updating\footnote{i.e., by deleting the original resource record and adding the new one.} the relevant record.
 
+\textbf{Update of an \texttt{A/AAAA} record of a domain or a subdomain:}
+An adversary can update an \texttt{A/AAAA} record of a domain or a subdomain in the zone file of the victim and change the existing IP address to the IP address of the machine under her control.
+In this way all the traffic intended for the domain holder will be redirected towards the adversary.
+
+\textbf{Update of an \texttt{MX} record:} 
+If the victim runs a mail server, the adversary can also change the \texttt{MX} resource record (e.g. \texttt{MX  10 mail.example.com}) and replace \url{mail.example.com} with the name of the mail server maintained by her (e.g. \url{mail.malicious.com}).
+The adversary may also need to set up an additional name server which will provide the DNS resolution of \url{mail.malicious.com}.
+If the name \url{mail.example.com} is managed by the same vulnerable to zone poisoning parent name server, the adversary may only update an \texttt{A/AAAA}  record of an original \url{mail.example.com} with its own IP address, as explained earlier.
+
+
+\subsubsection{Man-in-the-Middle (MITM) Attacks}
+The MITM attack is more sophisticated than simple domain hijacking but is also harder to detect. 
+The adversary needs to update the relevant DNS records in the same way as in the case of the domain hijacking attack, but also needs to forward the intercepted traffic back to the victim's server.
+%The adversary needs to replace the relevant DNS records using zone poisoning to intercept the communication and forward back the traffic to the victim mail server.
+
+\textbf{Update of an \texttt{A/AAAA} record of a domain or a subdomain:}
+The adversary needs to first update an \texttt{A/AAAA} record of a domain or a subdomain, as explained earlier.
+If the adversary's server acts as a simple proxy between the victim and its clients and only passively observes the traffic and redirects it back to the original server then she can gain limited but useful information about, for example, the number of clients, their IP addresses, or pages that were visited by the clients  (in case of web traffic). 
+In a more sophisticated attack the adversary can setup a service, in particular a phishing website to steal critical information from the customers of the victim, such as logins and passwords. 
+She should then forward the collected information back to the victim to increase the stealthiness of the~attack. 
+
+\textbf{Update of an \texttt{MX} record:} 
+Similarly to domain hijacking the adversary needs to update the \texttt{MX} resource record to redirect all traffic to her mail server, as explained earlier, %store emails of the clients 
+and then forward it back to the victim mail server.
+%MK: we'll explain later: If the adversary wants to run a phishing website it can also update the \texttt{MX} record and bypass email challenge to validate the domain (see Section \ref{sec:domainvalidation} for more details). 
+
+%and map its own IP address for the domain. In this case the traffic for his server will be redirected towards to the adversaries server. However, the victim or its customers would be able to detect the outage. If the adversary run a phishing website similar to the victim, he might be able to successfully steal customer information. Similarly, adversary will also be able to build a completely new sub-domain of our victim legitimate domain. He can then use the sub-domain to collect 
+
+
+
+
+
+
+\begin{comment}
 \subsubsection{Man-in-the-Middle (MITM) Attacks}
 The second type of the attack that adversary can use is the Man-in-the-Middle. 
 These attacks are more sophisticated but also harder to detect. 
@@ -194,6 +241,7 @@ to the victim mail server.
 %MK: we'll explain later: If the adversary wants to run a phishing website it can also update the \texttt{MX} record and bypass email challenge to validate the domain (see Section \ref{sec:domainvalidation} for more details). 
 
 %and map its own IP address for the domain. In this case the traffic for his server will be redirected towards to the adversaries server. However, the victim or its customers would be able to detect the outage. If the adversary run a phishing website similar to the victim, he might be able to successfully steal customer information. Similarly, adversary will also be able to build a completely new sub-domain of our victim legitimate domain. He can then use the sub-domain to collect 
+\end{comment}
 
 
 
@@ -254,15 +302,33 @@ The technique significantly increases the stealthiness of the attack without add
 % Our methodology to bypass DCV 
 % What does it add attack vectors 
 
-In order to establish the authenticity of the domain and have an encrypted communication between the browser of the user and a website, a digital certificate is used. It offers confidentiality to the user as all the data is encrypted using the SSL/TLS certificate offered by the website owner. The user before sending the encrypted traffic to the website establishes the integrity of the certificate from a  Certificate Authority (CA). 
+%In order to establish the authenticity of the domain and have an encrypted communication between the browser of the user and a website, a digital certificate is used. 
+In order to establish the authenticity of the domain and assure encrypted communication between the browser of the user and a website, a digital certificate is used. 
+%It offers provides confidentiality to the user as all the data is encrypted using the SSL/TLS certificate offered by the website owner. 
+%Before sending the encrypted traffic to the website establishes the integrity of the certificate from a  Certificate Authority (CA). 
+%
+To acquire a digitally signed certificate from a reputed Certificate Authority (CA) the domain owner must establish its legitimacy. The process through which a domain owner validates its ownership rights is known as Domain Control Validation (DCV). 
+%
+The three most common methods to establish the ownership are as follows:
 
-To acquire a digitally signed certificate from a reputed CA  the domain owner must establish its legitimacy. The process through which a  domain owner validates its ownership rights is known as Domain Control Validation (DCV). 
+\begin{itemize}
+    \item \textbf {Email validation} is one of the most well-known options to confirm domain ownership. 
+    During the certificate activation process, the domain owner selects one of the email addresses from either email address in whois records or domain-related emails. 
+    The domain related email addresses have generics in front of domains.
+    For the Comodo CA, for \url{example.com} the valid addresses could be  \url{administrator@example.com}, \url{admin@example.com}, 
+    \url{postmaster@example.com}, \url{webmaster@example.com} or \url{hostmaster@example.com}. 
+    Once the email address is selected the validation link is then sent to the requested email address for confirmation.
+    
+    \item \textbf{HTTP-based validation} requires to download a file from the CA and place it in the directory mentioned by the CA. The file must be accessible using HTTP request. For instance, in the case of example.com domain, the following URL should be accessible \url{http://example.com/.well-known/pki-validation/filename.txt}. This will enable CA to validate ownership of the domain owner.
 
-The three most common methods to establish the ownership are as follows. 
-a) \textbf {Email validation} is one of the most well-known options to confirm domain ownership. During the certificate activation process, the domain owner selects one of the email addresses from either email address in whois records or domain-related emails. The domain related email addresses have generics in front of domains for instance for example.com  the valid addresses could be admin@example.com, administrator@example.com, postmaster@example.com, webmaster@example.com or hostmaster@example.com. Once the email address is selected the validation link is then sent to the requested email address for confirmation. b) \textbf{HTTP-based validation} requires to download a file from the CA and place it in the directory mentioned by the CA. The file must be accessible using HTTP request. For instance, in the case of example.com domain, the following URL should be accessible http://example.com/.well-known/pki-validation/filename.txt. This will enable CA to validate ownership of the domain owner. c) \textbf{DNS-based validation} requires you to create a certain CNAME record in the DNS settings of your domain. The CNAME contains a random string generated by the CA. If the URL is accessible by the CA validates the domain ownership. 
+    \item \textbf{DNS-based validation} requires you to create a certain \texttt{CNAME} record in the DNS settings of your domain. The \texttt{CNAME} contains a random string generated by the CA. If the URL is accessible by the CA validates the domain ownership. 
+\end{itemize}
+
+In our experimental setup we %were able to by-pass 
+bypassed domain control validation and were able to obtain certificates from two top leading Certificate Authorities that provide free certificate (Let's Encrypt and Comodo) using the following methods:
 
 
-In our experimental setup we were able to by-pass domain control validation and were able to obtain certificates from two top Certificate Authorities (Let's encrypt and Comodo). %Majority of CA requires either email listed in SOA record or setup a challenge on the domain. Using our methodology the adversary can bypass both of the methods to obtain a legitimate certificate for the domain. 
+%Majority of CA requires either email listed in SOA record or setup a challenge on the domain. Using our methodology the adversary can bypass both of the methods to obtain a legitimate certificate for the domain. 
 
 \textbf{ Addition of an \texttt{MX} record:} 
 Adversary can also add mx record to victims zone file. It can be useful for particular places, a ) compromise email based challenge for domain control validation. %Adversary can also edit SOA records to get the abuse emails further avoid detection.
